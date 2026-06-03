@@ -62,7 +62,8 @@ Génère maintenant la question numéro ${nextNum} sur 10.
 Bloc : ${bloc}
 
 RÈGLES ABSOLUES :
-- Question courte (1 phrase max), claire, soutenue et professionnelle
+- Question MAXIMUM 10 mots — courte, directe, professionnelle
+- Jamais en majuscules complètes — écriture normale avec majuscule en début
 - Directement liée aux réponses précédentes — JAMAIS générique
 - Utilise "tu/toi" — ton consultant bienveillant
 - L'exemple doit être adapté exactement au projet de cette personne
