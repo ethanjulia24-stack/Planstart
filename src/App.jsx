@@ -20,11 +20,7 @@ const IMAGES = [
   "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80",
 ];
 
-const TEMOIGNAGES = [
-  { nom: "Sarah M.", ville: "Lyon", texte: "J'avais l'idée dans la tête depuis 2 ans. En 10 minutes j'avais un vrai plan. Mon salon est ouvert depuis 3 mois.", metier: "Coiffeuse" },
-  { nom: "Karim B.", ville: "Paris", texte: "En 10 minutes j'avais un plan complet pour mon restaurant. Je savais exactement quoi faire et dans quel ordre.", metier: "Restaurateur" },
-  { nom: "Julie T.", ville: "Bordeaux", texte: "Simple, rapide, et vraiment personnalisé. Je recommande à tous ceux qui veulent se lancer.", metier: "Entrepreneuse" },
-];
+
 
 const LOADING_STEPS = [
   { label: "LECTURE DE TES RÉPONSES", duration: 2000 },
@@ -490,7 +486,7 @@ ${data.sections.map((s, i) => {
               <h1 style={{ fontSize: isMobile ? "clamp(44px,13vw,72px)" : "clamp(72px,9vw,120px)", fontWeight: 900, lineHeight: 0.9, letterSpacing: "-0.03em", color: "#fff", marginBottom: 20, textTransform: "uppercase" }}>
                 TON PROJET.<br />TON PLAN.<br /><span style={{ color: "rgba(255,255,255,0.35)", fontStyle: "italic" }}>MAINTENANT.</span>
               </h1>
-              <p style={{ fontSize: isMobile ? 14 : 16, color: "rgba(255,255,255,0.6)", fontWeight: 400, marginBottom: 36, fontFamily: "Arial, sans-serif", maxWidth: 440 }}>Structure ton idée de business en 10 minutes grâce à l'IA.</p>
+              <p style={{ fontSize: isMobile ? 14 : 16, color: "rgba(255,255,255,0.6)", fontWeight: 400, marginBottom: 36, fontFamily: "Arial, sans-serif", maxWidth: 500 }}>Tu as une idée d'entreprise ? Réponds à 10 questions et obtiens un business plan personnalisé en quelques minutes. Gratuit et sans compte.</p>
               <button onClick={() => setScreen("quiz")} style={{ background: "#fff", color: "#000", border: "none", padding: isMobile ? "16px 40px" : "18px 48px", fontSize: 13, fontWeight: 900, letterSpacing: "0.12em" }}>CRÉER MON PLAN →</button>
             </div>
             <div style={{ position: "absolute", bottom: 32, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 8 }}>
@@ -518,7 +514,7 @@ ${data.sections.map((s, i) => {
                 <div style={{ height: 220, backgroundImage: "url(https://images.unsplash.com/photo-1664575602276-acd073f104c1?w=800&q=80)", backgroundSize: "cover", backgroundPosition: "center" }} />
                 <div style={{ background: "#000", color: "#fff", padding: "48px 20px" }}>
                   <div style={{ fontSize: 13, letterSpacing: "0.2em", color: "rgba(255,255,255,0.5)", marginBottom: 32, fontWeight: 900 }}>CE QUE TU OBTIENS</div>
-                  {["ANALYSE DE MARCHÉ", "MODÈLE ÉCONOMIQUE", "PLAN MARKETING", "PLAN D'ACTION 30/60/90 JOURS", "DÉMARCHES LÉGALES", "GESTION DES RISQUES"].map((item, i) => (
+                  {["ANALYSE DE MARCHÉ", "PROJECTIONS FINANCIÈRES", "STRATÉGIE MARKETING", "PLAN D'ACTION 90 JOURS", "DÉMARCHES LÉGALES", "GESTION DES RISQUES"].map((item, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "14px 0", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
                       <span style={{ fontSize: 13, color: "#fff", minWidth: 28, fontWeight: 900, opacity: 0.4 }}>{String(i + 1).padStart(2, "0")}</span>
                       <span style={{ fontSize: 14, fontWeight: 900 }}>{item}</span>
@@ -531,7 +527,7 @@ ${data.sections.map((s, i) => {
                 <div style={{ backgroundImage: "url(https://images.unsplash.com/photo-1664575602276-acd073f104c1?w=800&q=80)", backgroundSize: "cover", backgroundPosition: "center" }} />
                 <div style={{ background: "#000", color: "#fff", padding: "60px 48px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
                   <div style={{ fontSize: 13, letterSpacing: "0.2em", color: "rgba(255,255,255,0.5)", marginBottom: 36, fontWeight: 900 }}>CE QUE TU OBTIENS</div>
-                  {["ANALYSE DE MARCHÉ", "MODÈLE ÉCONOMIQUE", "PLAN MARKETING", "PLAN D'ACTION 30/60/90 JOURS", "DÉMARCHES LÉGALES", "GESTION DES RISQUES"].map((item, i) => (
+                  {["ANALYSE DE MARCHÉ", "PROJECTIONS FINANCIÈRES", "STRATÉGIE MARKETING", "PLAN D'ACTION 90 JOURS", "DÉMARCHES LÉGALES", "GESTION DES RISQUES"].map((item, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 20, padding: "16px 0", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
                       <span style={{ fontSize: 13, color: "#fff", minWidth: 32, fontWeight: 900, opacity: 0.4 }}>{String(i + 1).padStart(2, "0")}</span>
                       <span style={{ fontSize: 15, fontWeight: 900 }}>{item}</span>
@@ -546,7 +542,7 @@ ${data.sections.map((s, i) => {
           <div style={{ background: "#fff", padding: sectionPad, borderTop: "2px solid #000" }}>
             <div style={{ maxWidth: 900, margin: "0 auto" }}>
               <div style={{ fontSize: 13, letterSpacing: "0.2em", color: "#000", marginBottom: 40, fontWeight: 900 }}>FAIT POUR TOI SI —</div>
-              {["TU VEUX TE METTRE À TON COMPTE", "TU AS UN PROJET DANS LA RESTAURATION OU LE COMMERCE", "TU AS UNE IDÉE QUI TE TROTTE DANS LA TÊTE", "TU VEUX CRÉER TON ENTREPRISE ET CHANGER TA VIE"].map((item, i) => (
+              {["TU AS UNE IDÉE MAIS TU NE SAIS PAS PAR OÙ COMMENCER", "TU VEUX SAVOIR SI TON IDÉE EST VIABLE", "TU VEUX STRUCTURER TON PROJET RAPIDEMENT", "TU VEUX TE METTRE À TON COMPTE", "TU VEUX CRÉER TON ENTREPRISE AVEC UN PLAN CLAIR", "TU CHERCHES UN BUSINESS PLAN SIMPLE ET PERSONNALISÉ"].map((item, i) => (
                 <div key={i} style={{ borderBottom: "1px solid #e5e5e5", padding: "20px 0", display: "flex", alignItems: "flex-start", gap: 20 }}>
                   <span style={{ fontSize: 13, color: "#000", minWidth: 30, fontWeight: 900, paddingTop: 2, opacity: 0.4 }}>{String(i + 1).padStart(2, "0")}</span>
                   <span style={{ fontSize: isMobile ? 15 : 20, fontWeight: 900, lineHeight: 1.3 }}>{item}</span>
@@ -561,9 +557,9 @@ ${data.sections.map((s, i) => {
               <div style={{ fontSize: 13, letterSpacing: "0.2em", color: "#000", marginBottom: 48, fontWeight: 900 }}>COMMENT ÇA MARCHE</div>
               <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: isMobile ? 32 : 2 }}>
                 {[
-                  { n: "01", titre: "TU RÉPONDS", desc: "10 questions simples et personnalisées sur ton projet, ton profil et tes ambitions. Chaque question s'adapte à tes réponses précédentes." },
-                  { n: "02", titre: "ON ANALYSE", desc: "L'IA analyse ton profil en profondeur — marché, concurrents, finances — et crée un plan 100% adapté à ta situation spécifique." },
-                  { n: "03", titre: "TU TÉLÉCHARGES", desc: "Un business plan complet de 15 à 20 pages, structuré et professionnel, prêt à présenter à une banque ou un investisseur." },
+                  { n: "01", titre: "TU RÉPONDS", desc: "Réponds à 10 questions simples sur ton projet, ton expérience et tes objectifs. Chaque question s'adapte à tes réponses pour comprendre précisément ton idée." },
+                  { n: "02", titre: "ON CONSTRUIT TON PLAN", desc: "À partir de tes réponses, notre IA structure ton projet et génère une analyse complète : marché, stratégie, finances, plan d'action et démarches essentielles." },
+                  { n: "03", titre: "TU TÉLÉCHARGES", desc: "Récupère un business plan complet, personnalisé et prêt à t'aider à lancer ton activité." },
                 ].map((step, i) => (
                   <div key={i} style={{ padding: isMobile ? "0" : "0 40px 0 0", borderRight: !isMobile && i < 2 ? "1px solid #e5e5e5" : "none" }}>
                     <div style={{ fontSize: 48, fontWeight: 900, color: "#e5e5e5", lineHeight: 1, marginBottom: 16 }}>{step.n}</div>
@@ -575,22 +571,19 @@ ${data.sections.map((s, i) => {
             </div>
           </div>
 
-          {/* TÉMOIGNAGES */}
-          <div style={{ background: "#000", padding: sectionPad, borderTop: "2px solid #000" }}>
-            <div style={{ maxWidth: 1000, margin: "0 auto" }}>
-              <div style={{ fontSize: 13, letterSpacing: "0.2em", color: "#fff", marginBottom: 40, fontWeight: 900 }}>ILS SE SONT LANCÉS</div>
-              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: isMobile ? 12 : 2 }}>
-                {TEMOIGNAGES.map((t, i) => (
-                  <div key={i} style={{ background: "#fff", padding: "32px 24px", borderTop: "3px solid #fff" }}>
-                    <div style={{ fontSize: 40, fontWeight: 900, color: "#000", marginBottom: 12, lineHeight: 1, fontFamily: "Georgia, serif" }}>"</div>
-                    <p style={{ fontSize: 14, lineHeight: 1.7, color: "#000", fontFamily: "Arial, sans-serif", marginBottom: 20 }}>{t.texte}</p>
-                    <div style={{ borderTop: "1px solid #e5e5e5", paddingTop: 14 }}>
-                      <div style={{ fontSize: 13, fontWeight: 900, color: "#000" }}>{t.nom}</div>
-                      <div style={{ fontSize: 12, color: "rgba(0,0,0,0.45)", fontFamily: "Arial, sans-serif", marginTop: 2 }}>{t.metier} · {t.ville}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+          {/* REJOINS LES PREMIERS UTILISATEURS */}
+          <div style={{ background: "#000", padding: sectionPad, borderTop: "2px solid #000", textAlign: "center" }}>
+            <div style={{ maxWidth: 600, margin: "0 auto" }}>
+              <div style={{ fontSize: 13, letterSpacing: "0.2em", color: "rgba(255,255,255,0.4)", marginBottom: 24, fontWeight: 900 }}>REJOINS LES PREMIERS UTILISATEURS</div>
+              <h2 style={{ fontSize: isMobile ? 28 : 40, fontWeight: 900, color: "#fff", lineHeight: 1.1, marginBottom: 20, letterSpacing: "-0.02em" }}>
+                PLANSTART EST EN COURS DE LANCEMENT.
+              </h2>
+              <p style={{ fontSize: 16, color: "rgba(255,255,255,0.5)", fontFamily: "Arial, sans-serif", lineHeight: 1.7, marginBottom: 40 }}>
+                Génère ton business plan gratuitement et aide-nous à améliorer la plateforme. Ton avis nous aidera à rendre l'outil encore plus utile.
+              </p>
+              <button onClick={() => setScreen("quiz")} style={{ background: "#fff", color: "#000", border: "none", padding: isMobile ? "16px 40px" : "18px 48px", fontSize: 13, fontWeight: 900, letterSpacing: "0.12em" }}>
+                CRÉER MON PLAN →
+              </button>
             </div>
           </div>
 
@@ -600,11 +593,11 @@ ${data.sections.map((s, i) => {
               <div>
                 <div style={{ fontSize: 13, letterSpacing: "0.2em", color: "#000", marginBottom: 32, fontWeight: 900 }}>À PROPOS</div>
                 <h2 style={{ fontSize: isMobile ? 24 : 32, fontWeight: 900, letterSpacing: "-0.02em", lineHeight: 1.1, marginBottom: 20 }}>PLANSTART C'EST POUR CEUX QUI PASSENT À L'ACTION.</h2>
-                <p style={{ fontSize: 15, color: "rgba(0,0,0,0.6)", lineHeight: 1.7, fontFamily: "Arial, sans-serif", marginBottom: 16 }}>On a créé PLANSTART parce que des milliers de personnes ont une idée brillante mais ne savent pas par où commencer.</p>
-                <p style={{ fontSize: 15, color: "rgba(0,0,0,0.6)", lineHeight: 1.7, fontFamily: "Arial, sans-serif" }}>Notre mission : rendre l'entrepreneuriat accessible à tous — peu importe ton background, ton niveau d'études ou ton budget.</p>
+                <p style={{ fontSize: 15, color: "rgba(0,0,0,0.6)", lineHeight: 1.7, fontFamily: "Arial, sans-serif", marginBottom: 16 }}>J'ai créé PLANSTART parce que beaucoup de personnes ont une idée de projet mais ne savent pas comment la transformer en quelque chose de concret.</p>
+                <p style={{ fontSize: 15, color: "rgba(0,0,0,0.6)", lineHeight: 1.7, fontFamily: "Arial, sans-serif" }}>L'objectif est simple : rendre la création d'entreprise plus accessible en permettant à chacun d'obtenir un business plan structuré, sans connaissances particulières et sans dépenser des milliers d'euros.</p>
               </div>
               <div style={{ background: "#000", padding: "40px 32px" }}>
-                {[{ n: "100%", label: "Gratuit et sans compte" }, { n: "15-20", label: "Pages par business plan" }, { n: "10 min", label: "Pour compléter le questionnaire" }].map((stat, i) => (
+                {[{ n: "100%", label: "Gratuit et sans compte" }, { n: "7 sections", label: "Pour structurer ton projet" }, { n: "10 min", label: "Pour compléter le questionnaire" }].map((stat, i) => (
                   <div key={i} style={{ padding: "18px 0", borderBottom: i < 2 ? "1px solid rgba(255,255,255,0.1)" : "none" }}>
                     <div style={{ fontSize: 32, fontWeight: 900, color: "#fff", lineHeight: 1 }}>{stat.n}</div>
                     <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", fontFamily: "Arial, sans-serif", marginTop: 4, letterSpacing: "0.05em" }}>{stat.label}</div>
