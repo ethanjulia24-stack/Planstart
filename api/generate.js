@@ -120,8 +120,8 @@ RÈGLES ABSOLUES :
 - Chaque point doit avoir minimum 3 lignes d'explication
 - Estimations réalistes du marché français. Lorsque des données précises ne sont pas certaines, indique clairement qu'il s'agit d'une estimation
 - Honnêteté sur les obstacles — mais toujours une solution
-- Chaque section doit remplir au moins une page A4
-- NE JAMAIS résumer ou raccourcir — plus c'est détaillé mieux c'est
+- Chaque section doit être détaillée, concrète et directement exploitable
+- Privilégie la précision et l'utilité plutôt que la longueur
 - IMPORTANT : ne jamais inventer des chiffres présentés comme certains. Si une donnée est estimée, utilise 'environ', 'estimé à', 'approximativement'
 
 Réponds UNIQUEMENT en JSON valide sans backticks. Format EXACT :
@@ -242,7 +242,7 @@ Réponds UNIQUEMENT en JSON valide sans backticks. Format EXACT :
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-5",
-        max_tokens: 8000,
+        max_tokens: 5000,
         messages: [{ role: "user", content: prompt }],
       }),
     });
