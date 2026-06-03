@@ -1,8 +1,8 @@
 {
   "rewrites": [
-    { "source": "/mentions-legales", "destination": "/public/mentions-legales.html" },
-    { "source": "/confidentialite", "destination": "/public/confidentialite.html" },
-    { "source": "/cgu", "destination": "/public/cgu.html" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/mentions-legales", "destination": "/mentions-legales.html" },
+    { "source": "/confidentialite", "destination": "/confidentialite.html" },
+    { "source": "/cgu", "destination": "/cgu.html" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
