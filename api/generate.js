@@ -221,7 +221,7 @@ Réponds UNIQUEMENT en JSON valide sans backticks. Format EXACT :
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-5",
-        max_tokens: 4000,
+        max_tokens: 3000,
         messages: [{ role: "user", content: prompt }],
       }),
     });
