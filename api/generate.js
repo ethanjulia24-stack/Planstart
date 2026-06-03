@@ -126,7 +126,7 @@ Réponds UNIQUEMENT en JSON valide sans backticks. Format EXACT :
 {
   "nom": "Nom court mémorable (3 mots max)",
   "slogan": "Slogan différenciateur percutant",
-  "score": 78, // Indicateur de potentiel entre 0 et 100 — estimation subjective basée sur les informations fournies
+  "score": 78,
   "scoreExplication": "Explication détaillée en 3-4 phrases : forces, faiblesses, et 2-3 actions prioritaires pour améliorer la viabilité.",
   "sections": [
     {
@@ -251,6 +251,14 @@ Réponds UNIQUEMENT en JSON valide sans backticks. Format EXACT :
     } catch (e) {
       console.error("JSON parse error:", e.message);
       console.error("JSON length:", jsonMatch[0].length);
+      // Log autour de la position d'erreur
+      const pos = e.message.match(/position (\d+)/)?.[1];
+      if (pos) {
+        const p = parseInt(pos);
+        console.error("JSON around error:", jsonMatch[0].slice(Math.max(0, p-200), p+200));
+      } else {
+        console.error("JSON end:", jsonMatch[0].slice(-500));
+      }
       return res.status(500).json({ error: "Erreur lors de la génération — réessaie" });
     }
 
