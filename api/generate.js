@@ -235,8 +235,17 @@ Réponds UNIQUEMENT en JSON valide sans backticks. Format EXACT :
     const data = await response.json();
     const text = data.content.map(i => i.text || "").join("");
     
-    // Nettoyer la réponse des backticks markdown
-    const clean = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+    // Nettoyer la réponse — guillemets et backticks
+    const clean = text
+      .replace(/```json\s*/g, '')
+      .replace(/```\s*/g, '')
+      .replace(/\u00AB\s*/g, '"')
+      .replace(/\s*\u00BB/g, '"')
+      .replace(/\u201C/g, '"')
+      .replace(/\u201D/g, '"')
+      .replace(/\u2018/g, "'")
+      .replace(/\u2019/g, "'")
+      .trim();
     
     // Extraire le JSON
     const jsonMatch = clean.match(/\{[\s\S]*\}/);
