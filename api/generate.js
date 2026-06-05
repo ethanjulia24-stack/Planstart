@@ -280,6 +280,11 @@ INTRO: [1 phrase sur l'importance d'anticiper]
           }
         }
 
+        // Log pour debug
+        console.log("=== FULL TEXT LENGTH:", fullText.length);
+        console.log("=== FIRST 500:", fullText.slice(0, 500));
+        console.log("=== LAST 200:", fullText.slice(-200));
+        
         // Une fois tout reçu — parser et envoyer le résultat
         const result = parseStructuredText(fullText);
 
