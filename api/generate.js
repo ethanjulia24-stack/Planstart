@@ -39,6 +39,7 @@ function detectPromptInjection(answers) {
 
 function parseSections(text) {
   const sections = [];
+  // Nettoyer les # de titre mais garder les ** dans les points
   const lines = text.split("\n").map(l => l.trim()).filter(l => l);
   let currentSection = null;
   let currentPoints = [];
@@ -46,14 +47,17 @@ function parseSections(text) {
 
   for (const line of lines) {
     if (line.startsWith("---")) { skipDetail = true; continue; }
-    if (line.startsWith("##")) { skipDetail = false; }
+    if (line.startsWith("#")) { skipDetail = false; }
     if (skipDetail) continue;
 
-    if (line.startsWith("##")) {
+    if (line.startsWith("## ") || line.startsWith("# ")) {
+      // Ignorer les titres globaux comme "# BUSINESS PLAN - PARTIE 1"
+      const titre = line.replace(/^#+\s*/, "").trim();
+      if (titre.includes("BUSINESS PLAN") || titre.includes("PARTIE")) continue;
       if (currentSection && currentPoints.length > 0) {
         sections.push({ titre: currentSection.titre, intro: currentSection.intro, points: currentPoints });
       }
-      currentSection = { titre: line.replace(/^#+\s*/, "").trim(), intro: "" };
+      currentSection = { titre: titre, intro: "" };
       currentPoints = [];
     } else if (line.startsWith("INTRO:") && currentSection) {
       currentSection.intro = line.replace("INTRO:", "").trim();
@@ -221,7 +225,9 @@ INTRO: [1 phrase sur l'importance d'anticiper les obstacles]
     };
 
     console.log("=== TEXT1 FIRST 300:", text1.slice(0, 300));
-    const lines1 = text1.split("\n").map(l => l.trim()).filter(l => l);
+    // Nettoyer les astérisques markdown du texte
+    const cleanText1 = text1.replace(/\*\*/g, "");
+    const lines1 = cleanText1.split("\n").map(l => l.trim()).filter(l => l);
     let inScoreCriteres = false;
 
     for (const line of lines1) {
