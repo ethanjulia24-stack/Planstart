@@ -242,7 +242,7 @@ INTRO: [1 phrase sur l'importance d'anticiper]
 
     const parsed = parseStructuredText(text);
 
-    if (!parsed.nom || parsed.sections.length < 7) {
+    if (!parsed.nom || parsed.sections.length < 5) {
       console.error("Plan incomplet:", parsed.sections.length, "sections");
       return res.status(500).json({ error: "Plan incomplet — réessaie" });
     }
