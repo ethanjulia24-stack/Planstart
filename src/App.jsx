@@ -600,7 +600,7 @@ ${data.sections.map((s, i) => {
                 <p style={{ fontSize: 15, color: "rgba(0,0,0,0.6)", lineHeight: 1.7, fontFamily: "Arial, sans-serif" }}>L'objectif est simple : rendre la création d'entreprise plus accessible en permettant à chacun d'obtenir un business plan structuré, sans connaissances particulières et sans dépenser des milliers d'euros.</p>
               </div>
               <div style={{ background: "#000", padding: "40px 32px" }}>
-                {[{ n: "100%", label: "Gratuit" }, { n: "7 sections", label: "" }, { n: "10 min", label: "" }].map((stat, i) => (
+                {[{ n: "100% GRATUIT", label: "" }, { n: "7 SECTIONS", label: "" }, { n: "10 QUESTIONS", label: "" }].map((stat, i) => (
                   <div key={i} style={{ padding: "18px 0", borderBottom: i < 2 ? "1px solid rgba(255,255,255,0.1)" : "none" }}>
                     <div style={{ fontSize: 32, fontWeight: 900, color: "#fff", lineHeight: 1 }}>{stat.n}</div>
                     <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", fontFamily: "Arial, sans-serif", marginTop: 4, letterSpacing: "0.05em" }}>{stat.label}</div>
