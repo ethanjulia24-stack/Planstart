@@ -240,7 +240,14 @@ INTRO: [1 phrase sur l'importance d'anticiper]
 
     if (!text || text.length < 200) return res.status(500).json({ error: "Réponse vide" });
 
-    const parsed = parseStructuredText(text);
+    // LOG TEMPORAIRE - à supprimer après debug
+  console.log("=== RAW TEXT ===");
+  console.log(text);
+  console.log("=== END RAW TEXT ===");
+  
+  const parsed = parseStructuredText(text);
+  console.log("=== SECTIONS FOUND:", parsed.sections.length, "===");
+  parsed.sections.forEach((s, i) => console.log(`Section ${i+1}: ${s.titre}`));
 
     if (!parsed.nom || parsed.sections.length < 5) {
       console.error("Plan incomplet:", parsed.sections.length, "sections");
