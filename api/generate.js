@@ -127,7 +127,17 @@ export default async function handler(req, res) {
 Voici l'entretien avec l'entrepreneur :
 ${qaContext}
 
-RÈGLES : Réponds en format texte. JAMAIS de ---DETAIL---. 2-3 lignes max par point. Chiffres en fourchettes. Ton bienveillant.`;
+RÈGLES :
+- Réponds en format texte.
+- JAMAIS de ---DETAIL---.
+- 2 à 3 lignes maximum par point.
+- Tous les montants doivent être exprimés sous forme de fourchettes.
+- Si un chiffre n'est pas certain, préciser "(estimation indicative)".
+- Ne jamais donner de prix unique.
+- Ne jamais présenter une estimation comme une certitude.
+- Les données marché doivent être présentées comme des ordres de grandeur.
+- Privilégier la prudence plutôt que la précision.
+- Ton professionnel et bienveillant.`;
 
   try {
     // APPEL 1 : Infos de base + sections 1, 2, 3, 4
