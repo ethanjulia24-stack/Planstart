@@ -132,13 +132,12 @@ function LoadingScreen() {
       {/* Temps bien visible */}
       <div style={{ marginTop: 20, textAlign: "center" }}>
         <div style={{ fontSize: isMobile ? 32 : 40, fontWeight: 900, color: "#fff", letterSpacing: "0.02em", lineHeight: 1 }}>{formatTime(elapsed)}</div>
-        <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: "0.18em", color: "rgba(255,255,255,0.35)", marginTop: 6 }}>TEMPS ÉCOULÉ · CELA PEUT PRENDRE 1 À 3 MINUTES</div>
+        <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: "0.18em", color: "rgba(255,255,255,0.35)", marginTop: 6 }}>TEMPS ÉCOULÉ</div>
       </div>
 
-      {/* Avertissement : ne pas quitter la page */}
-      <div style={{ marginTop: 28, maxWidth: 440, width: "100%", border: "1px solid rgba(255,255,255,0.25)", borderRadius: 4, padding: "14px 18px", display: "flex", alignItems: "center", gap: 12, background: "rgba(255,255,255,0.04)" }}>
-        <span style={{ fontSize: 18, flexShrink: 0 }}>⚠️</span>
-        <span style={{ fontSize: isMobile ? 12 : 13, fontWeight: 900, color: "#fff", letterSpacing: "0.03em", lineHeight: 1.45 }}>NE QUITTE PAS CETTE PAGE — ton business plan est en cours de génération. Quitter maintenant l'annulerait.</span>
+      {/* Petite mention discrète */}
+      <div style={{ marginTop: 24, fontSize: 11, color: "rgba(255,255,255,0.3)", fontFamily: "Arial, sans-serif", textAlign: "center" }}>
+        Ne quitte pas cette page pendant la génération.
       </div>
     </div>
   );
