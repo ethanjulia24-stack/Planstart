@@ -1,6 +1,20 @@
 import { useState, useEffect, useRef } from "react";
 import html2pdf from "html2pdf.js";
 
+// Transforme les URL d'un texte en liens cliquables ENTIERS (jamais d'astérisque).
+// Version écran (renvoie du JSX).
+const linkify = (text) => {
+  const parts = String(text || "").split(/(https?:\/\/[^\s)]+)/g);
+  return parts.map((part, i) =>
+    /^https?:\/\//.test(part)
+      ? <a key={i} href={part} target="_blank" rel="noopener noreferrer" style={{ color: "#0a58ca", wordBreak: "break-all" }}>{part}</a>
+      : part
+  );
+};
+// Version PDF : prend du texte DÉJÀ échappé et enrobe les URL dans des <a>.
+const linkifyHtml = (escaped) =>
+  String(escaped).replace(/(https?:\/\/[^\s)<]+)/g, '<a href="$1" style="color:#0a58ca;word-break:break-all;">$1</a>');
+
 // ─── CONSTANTES ───────────────────────────────────────────────────────────────
 
 const FIRST_QUESTION = {
@@ -8,7 +22,7 @@ const FIRST_QUESTION = {
   bloc: "TON PROJET",
   question: "Qu'est-ce que tu veux créer ?",
   placeholder: "Ex: une barber shop dans mon quartier, une boutique en ligne de vêtements, un service de livraison de repas healthy...",
-  examples: ["Une barber shop", "Un restaurant", "Une boutique en ligne", "Un service à domicile", "Une application mobile", "Un salon de beauté"]
+  examples: ["Une barber shop", "Un restaurant", "Une boutique en ligne", "Un service à domicile"]
 };
 
 const TOTAL_QUESTIONS = 10;
@@ -34,21 +48,34 @@ const LOADING_STEPS = [
   { label: "FINALISATION DU DOSSIER", duration: 2000 },
 ];
 
+// Messages qui défilent pour rendre l'attente vivante (décrivent le vrai travail)
+const ROTATING_MESSAGES = [
+  "On lit attentivement tes réponses…",
+  "On vérifie les chiffres clés sur le web…",
+  "On source les données de marché…",
+  "On calcule ton modèle économique…",
+  "On rédige ton plan d'action sur mesure…",
+  "On rassemble les démarches légales…",
+  "On met en forme ton dossier…",
+];
+
 // ─── LOADING SCREEN ────────────────────────────────────────────────────────────
 
 function LoadingScreen() {
   const [stepIndex, setStepIndex] = useState(0);
   const [elapsed, setElapsed] = useState(0);
+  const [msgIndex, setMsgIndex] = useState(0);
   const isMobile = window.innerWidth < 768;
 
   useEffect(() => {
     const timer = setInterval(() => setElapsed(e => e + 1), 1000);
+    const msgTimer = setInterval(() => setMsgIndex(i => (i + 1) % ROTATING_MESSAGES.length), 4000);
     let cumulative = 0;
     const timers = LOADING_STEPS.slice(0, -1).map((step, i) => {
       cumulative += step.duration;
       return setTimeout(() => setStepIndex(i + 1), cumulative);
     });
-    return () => { clearInterval(timer); timers.forEach(clearTimeout); };
+    return () => { clearInterval(timer); clearInterval(msgTimer); timers.forEach(clearTimeout); };
   }, []);
 
   const totalDuration = LOADING_STEPS.reduce((s, step) => s + step.duration, 0) / 1000;
@@ -97,9 +124,21 @@ function LoadingScreen() {
         ))}
       </div>
 
-      <div style={{ marginTop: 36, fontSize: 11, color: "rgba(255,255,255,0.2)", fontFamily: "Arial, sans-serif", textAlign: "center" }}>
-        Temps écoulé : {formatTime(elapsed)} · Cela peut prendre 1 à 2 minutes
-        {elapsed > 45 && <div style={{ marginTop: 8, color: "rgba(255,255,255,0.3)" }}>Ton plan est détaillé et personnalisé — encore quelques instants...</div>}
+      {/* Message vivant qui défile */}
+      <div style={{ marginTop: 36, minHeight: 20, fontSize: isMobile ? 13 : 14, color: "rgba(255,255,255,0.6)", fontFamily: "Arial, sans-serif", textAlign: "center", transition: "opacity 0.4s" }}>
+        {ROTATING_MESSAGES[msgIndex]}
+      </div>
+
+      {/* Temps bien visible */}
+      <div style={{ marginTop: 20, textAlign: "center" }}>
+        <div style={{ fontSize: isMobile ? 32 : 40, fontWeight: 900, color: "#fff", letterSpacing: "0.02em", lineHeight: 1 }}>{formatTime(elapsed)}</div>
+        <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: "0.18em", color: "rgba(255,255,255,0.35)", marginTop: 6 }}>TEMPS ÉCOULÉ · CELA PEUT PRENDRE 1 À 3 MINUTES</div>
+      </div>
+
+      {/* Avertissement : ne pas quitter la page */}
+      <div style={{ marginTop: 28, maxWidth: 440, width: "100%", border: "1px solid rgba(255,255,255,0.25)", borderRadius: 4, padding: "14px 18px", display: "flex", alignItems: "center", gap: 12, background: "rgba(255,255,255,0.04)" }}>
+        <span style={{ fontSize: 18, flexShrink: 0 }}>⚠️</span>
+        <span style={{ fontSize: isMobile ? 12 : 13, fontWeight: 900, color: "#fff", letterSpacing: "0.03em", lineHeight: 1.45 }}>NE QUITTE PAS CETTE PAGE — ton business plan est en cours de génération. Quitter maintenant l'annulerait.</span>
       </div>
     </div>
   );
@@ -380,8 +419,8 @@ export default function App() {
           ${s.intro ? `<div class="section-intro">${escape(s.intro)}</div>` : ""}
           ${points.map(p => {
             const m = (p || "").match(/^\*\*(.+?)\*\*\s*:?\s*([\s\S]*)/);
-            if (m) return `<div class="point"><div class="point-label">${escape(m[1])}</div><div class="point-text">${escape(m[2])}</div></div>`;
-            return `<div class="point"><div class="point-text">${escape(p)}</div></div>`;
+            if (m) return `<div class="point"><div class="point-label">${escape(m[1])}</div><div class="point-text">${linkifyHtml(escape(m[2]))}</div></div>`;
+            return `<div class="point"><div class="point-text">${linkifyHtml(escape(p))}</div></div>`;
           }).join("")}
           <div class="pg-footer">PLANSTART — ${escape(data.nom)} — Page ${i + 3}</div>
         </div>`;
@@ -674,7 +713,7 @@ export default function App() {
             {/* Exemples cliquables sur toutes les questions */}
             {questions[qIndex]?.examples?.length > 0 && !current && (
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 20 }}>
-                {questions[qIndex].examples.map((ex, i) => (
+                {questions[qIndex].examples.slice(0, 4).map((ex, i) => (
                   <button key={i} className="example-pill" onClick={() => setCurrent(ex)} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.7)", padding: "8px 16px", fontSize: 12, fontFamily: "Arial, sans-serif", borderRadius: 20, transition: "all 0.2s", cursor: "pointer" }}>
                     {ex}
                   </button>
@@ -696,6 +735,12 @@ export default function App() {
               <div style={{ textAlign: "right", fontSize: 10, color: current.length > MAX_INPUT_LENGTH * 0.8 ? "rgba(255,200,100,0.7)" : "rgba(255,255,255,0.2)", marginTop: 4 }}>
                 {current.length}/{MAX_INPUT_LENGTH}
               </div>
+            </div>
+
+            {/* Encourage des réponses détaillées */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, fontSize: isMobile ? 11 : 12, color: "rgba(255,255,255,0.45)", fontFamily: "Arial, sans-serif", lineHeight: 1.5 }}>
+              <span style={{ fontSize: 13, flexShrink: 0 }}>✦</span>
+              <span>Plus ta réponse est précise et détaillée, plus ton business plan sera personnalisé et pertinent.</span>
             </div>
 
             {/* Loading question */}
@@ -790,10 +835,10 @@ export default function App() {
                             {m ? (
                               <>
                                 <span style={{ fontSize: 13, fontWeight: 900, minWidth: isMobile ? "auto" : 180, color: "#000", flexShrink: 0 }}>{m[1]}</span>
-                                <span style={{ fontSize: 14, color: "rgba(0,0,0,0.65)", lineHeight: 1.65, fontFamily: "Arial, sans-serif" }}>{m[2]}</span>
+                                <span style={{ fontSize: 14, color: "rgba(0,0,0,0.65)", lineHeight: 1.65, fontFamily: "Arial, sans-serif" }}>{linkify(m[2])}</span>
                               </>
                             ) : (
-                              <span style={{ fontSize: 14, color: "rgba(0,0,0,0.65)", lineHeight: 1.65, fontFamily: "Arial, sans-serif" }}>{point}</span>
+                              <span style={{ fontSize: 14, color: "rgba(0,0,0,0.65)", lineHeight: 1.65, fontFamily: "Arial, sans-serif" }}>{linkify(point)}</span>
                             )}
                           </div>
                         );
