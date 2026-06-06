@@ -83,9 +83,9 @@ async function callClaude(prompt) {
     },
     body: JSON.stringify({
       model: "claude-sonnet-4-5",
-      max_tokens: 5000,
-      system: "Tu es un expert en création d'entreprise. Tu utilises la recherche web pour vérifier les chiffres clés (tailles de marché, statistiques, prix, aides) et tu cites la source en URL complète. Réponds UNIQUEMENT dans le format texte demandé. JAMAIS de section ---DETAIL---. Chaque point : 2-3 lignes max.",
-      tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 3 }],
+      max_tokens: 4000,
+      system: "Tu es un expert en création d'entreprise. Tu utilises la recherche web UNIQUEMENT pour vérifier les 1-2 chiffres les plus importants (taille de marché, statistique clé) et tu cites la source en URL complète. Sois rapide et efficace. Réponds UNIQUEMENT dans le format texte demandé. JAMAIS de section ---DETAIL---. Chaque point : 2-3 lignes max.",
+      tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 2 }],
       messages: [{ role: "user", content: prompt }],
     }),
   });
