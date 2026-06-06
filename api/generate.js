@@ -204,11 +204,28 @@ INTRO: [1 phrase sur les priorités des 90 premiers jours]
 
 ## DÉMARCHES LÉGALES
 INTRO: [1 phrase sur les obligations légales]
+
 - **Statut recommandé :** [Micro-entrepreneur, SASU ou autre avec justification]
-- **Immatriculation :** [Site exact, documents, délai et coût]
-- **Aides disponibles :** [ACRE, NACRE, ARE Pôle Emploi — montants et conditions]
-- **Obligations sectorielles :** [Diplômes, licences ou certifications obligatoires]
-- **Assurances :** [Assurances obligatoires avec fourchette de prix]
+
+- **Immatriculation :**
+[Site officiel complet avec URL visible]
+[Documents nécessaires]
+[Délai]
+[Coût estimatif]
+
+- **Aides disponibles :**
+[Nom de l'aide]
+[Montant ou avantage]
+[Conditions]
+[URL officielle complète]
+
+- **Obligations sectorielles :**
+[Diplômes, licences ou certifications]
+[URL officielle complète si applicable]
+
+- **Assurances :**
+[Assurances obligatoires]
+[Fourchette de prix]
 
 ## RISQUES ET SOLUTIONS
 INTRO: [1 phrase sur l'importance d'anticiper les obstacles]
