@@ -1,4 +1,8 @@
 {
+  "functions": {
+    "api/generate.js": { "maxDuration": 60 },
+    "api/question.js": { "maxDuration": 30 }
+  },
   "rewrites": [
     { "source": "/mentions-legales", "destination": "/mentions-legales.html" },
     { "source": "/confidentialite", "destination": "/confidentialite.html" },
