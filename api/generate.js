@@ -95,8 +95,17 @@ async function callClaude(prompt) {
 
   if (!response.ok) throw new Error("Anthropic error");
   const data = await response.json();
-  // La réponse peut contenir plusieurs blocs (recherche web + texte) : on ne garde que le texte.
-  return data.content.map(i => (i.type === "text" ? i.text : "")).join("\n");
+  // La réponse peut contenir plusieurs blocs (recherche web + texte).
+  // On garde le texte ET on rattache les sources réellement citées (sécurité si le modèle ne les écrit pas lui-même).
+  return data.content.map(i => {
+    if (i.type !== "text") return "";
+    let t = i.text || "";
+    if (Array.isArray(i.citations) && i.citations.length) {
+      const urls = [...new Set(i.citations.map(c => c && c.url).filter(Boolean))];
+      if (urls.length) t += ` (Source : ${urls.join(" ; ")})`;
+    }
+    return t;
+  }).join("\n");
 }
 
 export default async function handler(req, res) {
@@ -136,7 +145,7 @@ RÈGLES :
 - Réponds en format texte. JAMAIS de ---DETAIL---. Ton bienveillant. Chaque point fait 3 à 5 lignes DENSES et utiles : donne le POURQUOI, le COMMENT et le COMBIEN (chiffres concrets) chaque fois que c'est pertinent. Bannis les phrases creuses valables pour n'importe quel métier ("créer une expérience unique", "fidéliser les clients") : sois spécifique et actionnable.
 - PERSONNALISATION MAXIMALE : ce plan parle du projet PRÉCIS de l'entrepreneur, pas du métier en général. Réutilise explicitement SES réponses (son budget exact, sa ville, son quartier, son expérience, ses objectifs, ses horaires). Écris "avec ton budget de X €", "dans ton quartier Y", "avec tes Z clients/jour" — jamais "un commerce type".
 - Tutoie TOUJOURS l'entrepreneur (tu, toi, ton, ta, tes). N'emploie JAMAIS "vous" ni "votre".
-- RECHERCHE ET SOURCES : tu as accès à la recherche web. Pour TOUT chiffre important (montant d'une aide, seuil légal, taille/croissance du marché, loyer moyen du quartier, prix pratiqués, concurrents locaux), VÉRIFIE-le par une recherche web AVANT de l'écrire, puis cite la source réelle juste après au format : "(Source : Nom — URL)". N'écris JAMAIS un chiffre officiel de mémoire, et n'invente JAMAIS de source : si une recherche ne donne rien de fiable, écris le chiffre en fourchette avec "(≈ à vérifier)" sans fausse source.
+- RECHERCHE ET SOURCES (ÉTAPE OBLIGATOIRE) : tu as accès à la recherche web. AVANT DE RÉDIGER QUOI QUE CE SOIT, effectue d'abord plusieurs recherches web sur : (1) le montant À JOUR des aides (ACRE, ARCE France Travail), (2) les loyers commerciaux de sa ville, (3) les concurrents réels de son secteur dans sa ville, (4) la réglementation à jour de son secteur. Ne rédige le plan qu'APRÈS ces recherches. Pour TOUT chiffre important, cite la source juste après, EN TEXTE BRUT que tu écris toi-même, au format "(Source : Nom — URL)" — ne te contente pas d'une citation automatique. N'écris JAMAIS un chiffre officiel de mémoire et n'invente JAMAIS de source : si une recherche ne donne rien de fiable, écris "(≈ à vérifier)" sans fausse source.
 - ANCRAGE LOCAL : raisonne à l'échelle du LIEU PRÉCIS indiqué (sa ville/quartier). Privilégie le local et le raisonnement bottom-up (à partir de SES chiffres). N'utilise une statistique nationale QUE si elle est sourcée par recherche web ET reliée à une conséquence concrète pour son projet — jamais une stat creuse isolée.
 - PROFONDEUR SECTORIELLE : creuse les obligations et spécificités RÉELLES de SON secteur précis (ex : restaurant → licence III/IV, ERP, accessibilité PMR, sécurité incendie, extraction, commission de sécurité, HACCP ; commerce alimentaire → DDPP ; e-commerce → RGPD, droit de rétractation ; métier réglementé → diplôme/qualification obligatoire). Vérifie les obligations à jour par recherche web. Ne reste pas générique.`;
 
