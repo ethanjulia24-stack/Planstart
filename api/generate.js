@@ -129,6 +129,7 @@ ${qaContext}
 
 RÈGLES :
 - Réponds en format texte. JAMAIS de ---DETAIL---. 2-3 lignes max par point. Ton bienveillant.
+- Tutoie TOUJOURS l'entrepreneur (tu, toi, ton, ta, tes). N'emploie JAMAIS "vous" ni "votre".
 - Chiffres en fourchettes. Si tu n'es pas certain d'un chiffre, écris-le suivi de "(≈ approximatif)".
 - N'invente JAMAIS de source ni d'URL. Quand tu cites une démarche ou une ressource, reste général ("le guichet unique", "l'URSSAF", "France Travail") sans mettre de lien : les liens officiels sont ajoutés automatiquement en fin de dossier.`;
 
