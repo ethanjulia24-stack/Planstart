@@ -131,9 +131,9 @@ RÈGLES :
 - Réponds en format texte. JAMAIS de ---DETAIL---. 2-3 lignes max par point. Ton bienveillant.
 - Tutoie TOUJOURS l'entrepreneur (tu, toi, ton, ta, tes). N'emploie JAMAIS "vous" ni "votre".
 - Chiffres en fourchettes. Si tu n'es pas certain d'un chiffre, écris-le suivi de "(≈ approximatif)".
-- ANCRAGE LOCAL : raisonne toujours à l'échelle du LIEU PRÉCIS indiqué par l'entrepreneur (sa ville/commune). Adapte tout à cette échelle. N'utilise PAS de statistiques nationales creuses (ex : "le marché pèse 30 milliards d'euros") qui n'aident pas sa décision. Quand tu n'as pas la donnée locale exacte (concurrents nommés, loyers réels), dis-le clairement et invite-le à la vérifier sur place, plutôt que d'inventer.
+- ANCRAGE LOCAL : raisonne toujours à l'échelle du LIEU PRÉCIS indiqué par l'entrepreneur (sa ville/commune). Adapte tout à cette échelle. N'utilise PAS de statistiques nationales creuses (ex : "le marché pèse 30 milliards d'euros", "plusieurs centaines de millions", "croissance de +8-12% par an", "73% des Français") qui n'aident pas sa décision. Quand tu n'as pas la donnée locale exacte (concurrents nommés, loyers réels), dis-le clairement et invite-le à la vérifier sur place, plutôt que d'inventer.
 - PROFONDEUR SECTORIELLE : creuse les obligations et spécificités RÉELLES de SON secteur précis (ex : restaurant → licence III/IV, ERP, accessibilité PMR, sécurité incendie, extraction, commission de sécurité, HACCP ; commerce alimentaire → DDPP ; e-commerce → RGPD, droit de rétractation ; métier réglementé → diplôme/qualification obligatoire). Ne reste pas générique.
-- N'invente JAMAIS de source ni d'URL. Quand tu cites une démarche ou une ressource, reste général ("le guichet unique", "l'URSSAF", "France Travail") sans mettre de lien : les liens officiels sont ajoutés automatiquement en fin de dossier.`;
+- N'invente JAMAIS de source ni d'URL. Ne mets JAMAIS de fausse caution de source entre parenthèses (ex : "(source INSEE 2023)", "(selon une étude)") : si tu n'as pas de lien réel, n'attribue AUCUNE source — donne juste le chiffre en fourchette avec "(≈ approximatif)". Quand tu cites une démarche ou une ressource, reste général ("le guichet unique", "l'URSSAF", "France Travail") sans mettre de lien : les liens officiels sont ajoutés automatiquement en fin de dossier.`;
 
   try {
     // APPEL 1 : Infos de base + sections 1, 2, 3, 4
@@ -144,7 +144,7 @@ Génère la PARTIE 1 du business plan dans ce format exact :
 NOM: [Nom du business, 2-3 mots]
 SLOGAN: [Slogan court]
 SCORE: [nombre /100 = moyenne des 6 critères ci-dessous ramenée sur 100, arrondie. Ne mets PAS un score arbitraire : il doit correspondre à la moyenne réelle des 6 notes.]
-SCORE_EXPLICATION: [1 phrase]
+SCORE_EXPLICATION: [1 phrase HONNÊTE mais CONSTRUCTIVE : ce qui est solide + le principal levier pour progresser, jamais un simple couperet décourageant]
 SCORE_CRITERES:
 - Experience: [note /10] — [1 phrase]
 - Marche: [note /10] — [1 phrase]
@@ -152,6 +152,8 @@ SCORE_CRITERES:
 - Budget: [note /10] — [1 phrase]
 - Clarte: [note /10] — [1 phrase]
 - Timing: [note /10] — [1 phrase]
+
+RÈGLE DE NOTATION : note chaque critère justement et sans complaisance, MAIS sans pénaliser abusivement un débutant — manquer d'expérience ou de gros budget au démarrage est NORMAL et ne doit pas faire chuter tout le score. Un projet sincère et réaliste mérite une note correcte. Garde l'évaluation honnête, mais encourageante et tournée vers le progrès.
 
 ## PORTRAIT DU PROJET
 INTRO: [1 phrase d'accroche]
