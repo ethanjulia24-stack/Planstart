@@ -100,10 +100,11 @@ async function callClaude(prompt) {
   const blocks = data.content.filter(i => i.type === "text");
   const text = blocks.map(i => i.text || "").join("");
   // Filet de sécurité : si des recherches ont eu lieu mais que le modèle n'a écrit aucune source,
-  // on rattache les liens consultés en fin de texte (sans casser les phrases).
+  // on rattache UNIQUEMENT les liens de confiance consultés (jamais les sites douteux).
+  const TRUSTED = /(\.gouv\.fr|insee\.fr|urssaf\.fr|service-public|francetravail\.fr|bpifrance|\.cci\.fr|cma\.fr|cnil\.fr|banque-france\.fr|jll\.|cbre\.)/i;
   const urls = [...new Set(
     blocks.flatMap(i => (Array.isArray(i.citations) ? i.citations.map(c => c && c.url) : [])).filter(Boolean)
-  )];
+  )].filter(u => TRUSTED.test(u));
   if (urls.length && !/Source\s*:/i.test(text)) {
     return `${text}\n- **Sources consultées :** ${urls.join(" ; ")}`;
   }
@@ -150,7 +151,7 @@ RÈGLES :
 - RECHERCHE ET SOURCES (ÉTAPE OBLIGATOIRE) : tu as accès à la recherche web. AVANT DE RÉDIGER QUOI QUE CE SOIT, effectue d'abord plusieurs recherches web sur : (1) le montant À JOUR des aides (ACRE, ARCE France Travail), (2) les loyers commerciaux de sa ville, (3) les concurrents réels de son secteur dans sa ville, (4) la réglementation à jour de son secteur. Ne rédige le plan qu'APRÈS ces recherches. Pour TOUT chiffre important, cite la source juste après, EN TEXTE BRUT que tu écris toi-même, au format "(Source : Nom — URL)" — ne te contente pas d'une citation automatique. N'écris JAMAIS un chiffre officiel de mémoire et n'invente JAMAIS de source : si une recherche ne donne rien de fiable, écris "(≈ à vérifier)" sans fausse source.
 - ANCRAGE LOCAL : raisonne à l'échelle du LIEU PRÉCIS indiqué (sa ville/quartier). Privilégie le local et le raisonnement bottom-up (à partir de SES chiffres). N'utilise une statistique nationale QUE si elle est sourcée par recherche web ET reliée à une conséquence concrète pour son projet — jamais une stat creuse isolée.
 - PROFONDEUR SECTORIELLE : creuse les obligations et spécificités RÉELLES de SON secteur précis (ex : restaurant → licence III/IV, ERP, accessibilité PMR, sécurité incendie, extraction, commission de sécurité, HACCP ; commerce alimentaire → DDPP ; e-commerce → RGPD, droit de rétractation ; métier réglementé → diplôme/qualification obligatoire). Vérifie les obligations à jour par recherche web. Ne reste pas générique.
-- QUALITÉ DES SOURCES : ne cite QUE des sources fiables et reconnues — organismes officiels et institutions (INSEE, URSSAF, service-public, France Travail, Bpifrance, CCI/CMA, CNIL, fédérations professionnelles, ministères). N'utilise JAMAIS comme source un blog SEO, un site marchand, ou un revendeur de rapports payants (sites inconnus du grand public). Mieux vaut MOINS de chiffres mais des sources de confiance : si la seule source d'un chiffre est douteuse, ne donne pas le chiffre et reste qualitatif. La confiance prime sur la quantité.
+- QUALITÉ DES SOURCES (RÈGLE STRICTE) : tu ne cites une source QUE si elle vient d'une institution ou d'un organisme reconnu — sites en .gouv.fr, INSEE, URSSAF, service-public, France Travail, Bpifrance, CCI/CMA, CNIL, Banque de France, ministères, fédérations professionnelles officielles, ou un grand cabinet immobilier reconnu pour un loyer (ex : JLL, CBRE). INTERDIT formellement comme source : blogs SEO, sites marchands ou de vendeurs (logiciels de caisse, fournisseurs, e-commerçants), revendeurs de rapports payants, comparateurs, agrégateurs, sites d'actualité ou de sorties. Si le seul résultat pour un chiffre vient d'un tel site, NE METS AUCUN lien : écris le chiffre en fourchette avec "(≈ à vérifier)" sans source. Mieux vaut zéro source qu'une source douteuse — la confiance prime toujours sur la quantité.
 - PRUDENCE SUR LES AFFIRMATIONS : n'avance JAMAIS de statistique choc non sourçable (ex : "80% des boutiques ferment en 18 mois"). Formule prudemment et qualitativement ("beaucoup d'e-commerces échouent dans leurs premières années"). Aucun chiffre précis sans source officielle réelle.
 - TON : évite la litanie d'injonctions ("tu dois… tu dois… tu dois…"). Présente plutôt les choses comme des constats, des leviers et des points de vigilance. Quand c'est pertinent, distingue ce qui joue EN SA FAVEUR, ce qui joue CONTRE LUI, et ce qui mérite une VÉRIFICATION TERRAIN.`;
 
