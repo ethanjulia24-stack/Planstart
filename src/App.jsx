@@ -50,9 +50,9 @@ const LOADING_STEPS = [
 // Messages qui défilent pour rendre l'attente vivante (décrivent le vrai travail)
 const ROTATING_MESSAGES = [
   "On lit attentivement tes réponses…",
-  "On vérifie les chiffres clés sur le web…",
-  "On source les données de marché…",
+  "On analyse ton marché local…",
   "On calcule ton modèle économique…",
+  "On construit ta stratégie marketing…",
   "On rédige ton plan d'action sur mesure…",
   "On rassemble les démarches légales…",
   "On met en forme ton dossier…",
@@ -87,6 +87,8 @@ function LoadingScreen() {
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes pulse3 { 0%,100%{opacity:1} 50%{opacity:0.3} }
       `}</style>
+
+      <div style={{ width: "100%", maxWidth: 520, border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12, background: "rgba(255,255,255,0.025)", padding: isMobile ? "40px 24px" : "52px 48px", display: "flex", flexDirection: "column", alignItems: "center" }}>
 
       <div style={{ marginBottom: 48, textAlign: "center" }}>
         <div style={{ fontSize: 10, letterSpacing: "0.3em", color: "rgba(255,255,255,0.25)", marginBottom: 8, fontWeight: 900 }}>PLANSTART</div>
@@ -137,6 +139,8 @@ function LoadingScreen() {
       {/* Petite mention discrète */}
       <div style={{ marginTop: 24, fontSize: 11, color: "rgba(255,255,255,0.3)", fontFamily: "Arial, sans-serif", textAlign: "center" }}>
         Ne quitte pas cette page pendant la génération.
+      </div>
+
       </div>
     </div>
   );
@@ -345,7 +349,7 @@ export default function App() {
 
   // ─── PDF ──────────────────────────────────────────────────────────────────────
 
-  const downloadPDF = (data) => {
+  const downloadPDF = async (data) => {
     const date = new Date().toLocaleDateString("fr-FR");
     const escape = str => (str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     const sections = data.sections || [];
@@ -444,16 +448,33 @@ ${sections.map((s, i) => {
 </body>
 </html>`;
 
-    // Télécharge un fichier HTML : tu l'ouvres puis "Imprimer → Enregistrer en PDF".
+    // Nom du fichier
+    const filename = `${(data.nom || "BusinessPlan").replace(/\s+/g, "_")}_PLANSTART.html`;
     const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+
+    // MOBILE : feuille de partage native (Enregistrer dans Fichiers, Imprimer, envoyer…)
+    // car iOS/Safari ignore l'attribut "download" et ne télécharge pas le fichier.
+    try {
+      const file = new File([blob], filename, { type: "text/html" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: `Business plan — ${data.nom || "PLANSTART"}` });
+        return;
+      }
+    } catch (e) {
+      // L'utilisateur a fermé la feuille de partage : on s'arrête, pas de repli.
+      if (e && e.name === "AbortError") return;
+      // Sinon (partage non supporté), on tente le téléchargement classique ci-dessous.
+    }
+
+    // ORDINATEUR (et repli) : téléchargement classique du fichier HTML.
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${(data.nom || "BusinessPlan").replace(/\s+/g, "_")}_PLANSTART.html`;
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
   // ─── STYLES ───────────────────────────────────────────────────────────────────
