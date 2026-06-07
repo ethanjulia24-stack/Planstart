@@ -131,6 +131,8 @@ RÈGLES :
 - Réponds en format texte. JAMAIS de ---DETAIL---. 2-3 lignes max par point. Ton bienveillant.
 - Tutoie TOUJOURS l'entrepreneur (tu, toi, ton, ta, tes). N'emploie JAMAIS "vous" ni "votre".
 - Chiffres en fourchettes. Si tu n'es pas certain d'un chiffre, écris-le suivi de "(≈ approximatif)".
+- ANCRAGE LOCAL : raisonne toujours à l'échelle du LIEU PRÉCIS indiqué par l'entrepreneur (sa ville/commune). Adapte tout à cette échelle. N'utilise PAS de statistiques nationales creuses (ex : "le marché pèse 30 milliards d'euros") qui n'aident pas sa décision. Quand tu n'as pas la donnée locale exacte (concurrents nommés, loyers réels), dis-le clairement et invite-le à la vérifier sur place, plutôt que d'inventer.
+- PROFONDEUR SECTORIELLE : creuse les obligations et spécificités RÉELLES de SON secteur précis (ex : restaurant → licence III/IV, ERP, accessibilité PMR, sécurité incendie, extraction, commission de sécurité, HACCP ; commerce alimentaire → DDPP ; e-commerce → RGPD, droit de rétractation ; métier réglementé → diplôme/qualification obligatoire). Ne reste pas générique.
 - N'invente JAMAIS de source ni d'URL. Quand tu cites une démarche ou une ressource, reste général ("le guichet unique", "l'URSSAF", "France Travail") sans mettre de lien : les liens officiels sont ajoutés automatiquement en fin de dossier.`;
 
   try {
@@ -141,7 +143,7 @@ Génère la PARTIE 1 du business plan dans ce format exact :
 
 NOM: [Nom du business, 2-3 mots]
 SLOGAN: [Slogan court]
-SCORE: [50 à 90]
+SCORE: [nombre /100 = moyenne des 6 critères ci-dessous ramenée sur 100, arrondie. Ne mets PAS un score arbitraire : il doit correspondre à la moyenne réelle des 6 notes.]
 SCORE_EXPLICATION: [1 phrase]
 SCORE_CRITERES:
 - Experience: [note /10] — [1 phrase]
@@ -201,7 +203,7 @@ INTRO: [1 phrase sur les obligations légales]
 - **Statut recommandé :** [Micro-entrepreneur, SASU ou autre avec justification]
 - **Immatriculation :** [Site exact, documents, délai et coût]
 - **Aides disponibles :** [ACRE, NACRE, ARE Pôle Emploi — montants et conditions]
-- **Obligations sectorielles :** [Diplômes, licences ou certifications obligatoires]
+- **Obligations sectorielles :** [TOUTES les obligations RÉELLES propres à ce secteur précis : diplômes/qualifications obligatoires, licences (ex : licence III/IV pour l'alcool), classement ERP, accessibilité PMR, sécurité incendie, extraction/ventilation, commission de sécurité, déclarations spécifiques (DDPP…), normes d'hygiène. Sois précis et exhaustif pour CE métier.]
 - **Assurances :** [Assurances obligatoires avec fourchette de prix]
 
 ## RISQUES ET SOLUTIONS
@@ -240,6 +242,16 @@ INTRO: [1 phrase sur l'importance d'anticiper les obstacles]
       else if (line.startsWith("SCORE_CRITERES:")) inScoreCriteres = true;
       else if (inScoreCriteres && line.startsWith("-")) result.scoreCriteres.push(line.replace(/^-\s*/, "").trim());
       else if (line.startsWith("##")) inScoreCriteres = false;
+    }
+
+    // Score TRANSPARENT : on recalcule la moyenne réelle des 6 critères /10
+    // (au lieu de faire confiance au nombre donné par le modèle).
+    const notes = result.scoreCriteres
+      .map(c => { const m = c.match(/(\d+(?:[.,]\d+)?)\s*\/\s*10/); return m ? parseFloat(m[1].replace(",", ".")) : null; })
+      .filter(n => n !== null && n >= 0 && n <= 10);
+    if (notes.length >= 4) {
+      const moyenne = notes.reduce((a, b) => a + b, 0) / notes.length;
+      result.score = Math.round(moyenne * 10);
     }
 
     // Parser les sections des 2 parties
