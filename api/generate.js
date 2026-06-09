@@ -263,7 +263,8 @@ INTRO: [1 phrase sur l'importance d'anticiper les obstacles]
       score: 70,
       scoreExplication: "",
       scoreCriteres: [],
-      sections: []
+      sections: [],
+      activite: Object.values(sanitizedAnswers)[0]?.slice(0, 90) || ""
     };
 
     const cleanText1 = text1.replace(/\*\*/g, "");
