@@ -88,7 +88,7 @@ async function callClaude(prompt) {
     },
     body: JSON.stringify({
       model: "claude-sonnet-4-5",
-      max_tokens: 8000,
+      max_tokens: 10000,
       system: "Tu es un consultant senior expert en création d'entreprise en France. Tu as accès à la recherche web : utilise-la pour VÉRIFIER les chiffres clés (montants des aides, seuils légaux, taille et tendances du marché, loyers et concurrents locaux) AVANT de les écrire, puis cite la source réelle. Réponds UNIQUEMENT dans le format texte demandé. JAMAIS de section ---DETAIL---.",
       tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 5 }],
       messages: [{ role: "user", content: prompt }],
@@ -223,6 +223,8 @@ INTRO: [1 phrase sur la stratégie globale]
     const prompt2 = `${contexte}
 
 Génère la PARTIE 2 du business plan dans ce format exact :
+
+IMPORTANT : commence ta réponse DIRECTEMENT par la ligne "## PLAN D'ACTION 90 JOURS" ci-dessous. Aucun préambule, aucune phrase d'introduction, même après tes recherches web.
 
 ## PLAN D'ACTION 90 JOURS
 INTRO: [1 phrase sur les priorités des 90 premiers jours]
