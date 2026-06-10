@@ -164,6 +164,7 @@ export default function App() {
   const [loadingQuestion, setLoadingQuestion] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const [showIosHint, setShowIosHint] = useState(false);
   const [shareToast, setShareToast] = useState(false);
   const inputRef = useRef(null);
 
@@ -467,58 +468,30 @@ ${sections.map((s, i) => {
 </body>
 </html>`;
 
-    const filename = `${(data.titre || data.nom || "BusinessPlan").replace(/[^\wÀ-ÿ]+/g, "_").replace(/^_+|_+$/g, "")}_PLANSTART.pdf`;
+    const filename = `${(data.titre || data.nom || "BusinessPlan").replace(/[^\wÀ-ÿ]+/g, "_").replace(/^_+|_+$/g, "")}_PLANSTART.html`;
+    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
 
-    // Repli (impression navigateur) si html2pdf n'a pas chargé.
-    const printFallback = () => {
-      const printDoc = html.replace("</body>", `<script>window.onload=function(){setTimeout(function(){window.focus();window.print();},500);};<\/script></body>`);
-      const w = window.open("", "_blank");
-      if (w) { w.document.open(); w.document.write(printDoc); w.document.close(); return; }
-      const iframe = document.createElement("iframe");
-      iframe.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0;";
-      document.body.appendChild(iframe);
-      const idoc = iframe.contentWindow.document;
-      idoc.open(); idoc.write(printDoc); idoc.close();
-      setTimeout(() => { try { document.body.removeChild(iframe); } catch (e) {} }, 60000);
-    };
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
-    // VRAI TÉLÉCHARGEMENT PDF en un clic via html2pdf (chargé en CDN dans index.html).
-    if (typeof window !== "undefined" && window.html2pdf) {
-      try {
-        // On construit le document dans un conteneur hors-écran.
-        const container = document.createElement("div");
-        container.innerHTML = html.replace(/^[\s\S]*?<body[^>]*>/, "").replace(/<\/body>[\s\S]*$/, "");
-        // On réinjecte les styles du template.
-        const styleMatch = html.match(/<style>([\s\S]*?)<\/style>/);
-        if (styleMatch) {
-          const st = document.createElement("style");
-          st.textContent = styleMatch[1];
-          container.appendChild(st);
-        }
-        container.style.cssText = "position:fixed;left:-9999px;top:0;width:794px;background:#fff;";
-        document.body.appendChild(container);
-
-        const opt = {
-          margin: 0,
-          filename,
-          image: { type: "jpeg", quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true, backgroundColor: "#ffffff" },
-          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-          pagebreak: { mode: ["css", "legacy"], before: ".section", avoid: ".point" }
-        };
-
-        await window.html2pdf().set(opt).from(container).save();
-        document.body.removeChild(container);
-        return;
-      } catch (e) {
-        // Si html2pdf échoue, on bascule sur l'impression navigateur.
-        printFallback();
-        return;
-      }
+    if (isIOS) {
+      // Sur iOS, Safari ignore l'attribut "download". On ouvre le fichier dans un
+      // nouvel onglet : l'utilisateur fait Partager → "Enregistrer dans Fichiers".
+      setShowIosHint(true);
+      window.open(url, "_blank");
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+      return;
     }
 
-    // html2pdf indisponible → impression navigateur.
-    printFallback();
+    // PC / Android : téléchargement direct du fichier HTML.
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
   // ─── STYLES ───────────────────────────────────────────────────────────────────
@@ -934,6 +907,14 @@ ${sections.map((s, i) => {
                       ↓ TÉLÉCHARGER MON PLAN
                     </button>
                   </div>
+                  {showIosHint && (
+                    <div style={{ marginTop: 20, padding: "14px 18px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, maxWidth: 420, margin: "20px auto 0" }}>
+                      <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 13, fontFamily: "Arial, sans-serif", lineHeight: 1.5 }}>
+                        📄 Ton plan s'est ouvert dans un nouvel onglet.<br />
+                        Pour l'enregistrer : appuie sur <strong>Partager</strong> <span style={{ fontFamily: "Arial" }}>(en bas)</span> → <strong>Enregistrer dans Fichiers</strong>.
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 <button onClick={restart} style={{ background: "transparent", border: "none", color: "rgba(0,0,0,0.3)", fontSize: 11, fontWeight: 900, letterSpacing: "0.1em", marginTop: 32, padding: 0, cursor: "pointer" }}>← NOUVELLE IDÉE</button>
