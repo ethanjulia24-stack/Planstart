@@ -37,20 +37,22 @@ const IMAGES = [
 
 
 const LOADING_STEPS = [
-  { label: "LECTURE DE TES RÉPONSES", duration: 2000 },
-  { label: "ANALYSE DU MARCHÉ", duration: 3500 },
-  { label: "CALCUL DU MODÈLE ÉCONOMIQUE", duration: 3500 },
-  { label: "CONSTRUCTION DE TA STRATÉGIE", duration: 3000 },
-  { label: "RÉDACTION DU PLAN D'ACTION", duration: 3000 },
-  { label: "DÉMARCHES LÉGALES", duration: 2500 },
-  { label: "ANALYSE DES RISQUES", duration: 2500 },
-  { label: "FINALISATION DU DOSSIER", duration: 2000 },
+  { label: "LECTURE DE TES RÉPONSES", duration: 6000 },
+  { label: "RECHERCHE DE DONNÉES RÉELLES", duration: 32000 },
+  { label: "ANALYSE DU MARCHÉ", duration: 22000 },
+  { label: "CALCUL DU MODÈLE ÉCONOMIQUE", duration: 22000 },
+  { label: "CONSTRUCTION DE TA STRATÉGIE", duration: 18000 },
+  { label: "RÉDACTION DU PLAN D'ACTION", duration: 18000 },
+  { label: "DÉMARCHES LÉGALES & RISQUES", duration: 22000 },
+  { label: "FINALISATION DU DOSSIER", duration: 10000 },
 ];
 
-// Messages qui défilent pour rendre l'attente vivante (décrivent le vrai travail)
+// Messages qui défilent — décrivent le VRAI travail effectué, sans rien inventer.
 const ROTATING_MESSAGES = [
   "On lit attentivement tes réponses…",
-  "On analyse ton marché local…",
+  "On recherche des données réelles sur le web…",
+  "On vérifie les aides et seuils légaux à jour…",
+  "On analyse ton marché et tes concurrents…",
   "On calcule ton modèle économique…",
   "On construit ta stratégie marketing…",
   "On rédige ton plan d'action sur mesure…",
@@ -68,7 +70,7 @@ function LoadingScreen() {
 
   useEffect(() => {
     const timer = setInterval(() => setElapsed(e => e + 1), 1000);
-    const msgTimer = setInterval(() => setMsgIndex(i => (i + 1) % ROTATING_MESSAGES.length), 4000);
+    const msgTimer = setInterval(() => setMsgIndex(i => (i + 1) % ROTATING_MESSAGES.length), 6000);
     let cumulative = 0;
     const timers = LOADING_STEPS.slice(0, -1).map((step, i) => {
       cumulative += step.duration;
@@ -77,8 +79,11 @@ function LoadingScreen() {
     return () => { clearInterval(timer); clearInterval(msgTimer); timers.forEach(clearTimeout); };
   }, []);
 
-  const totalDuration = LOADING_STEPS.reduce((s, step) => s + step.duration, 0) / 1000;
-  const globalProgress = Math.min((elapsed / totalDuration) * 100, 85);
+  // Progression asymptotique : avance vite au début puis ralentit, sans jamais
+  // se figer ni atteindre 100%. Elle ne ment pas sur un temps précis — c'est la
+  // vraie fin de génération (loading=false) qui fait disparaître cet écran.
+  // ~63% à 60s, ~86% à 150s, tend vers 96% sans l'atteindre.
+  const globalProgress = Math.min(96 * (1 - Math.exp(-elapsed / 75)), 96);
   const formatTime = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 
   return (
@@ -136,9 +141,9 @@ function LoadingScreen() {
         <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: "0.18em", color: "rgba(255,255,255,0.35)", marginTop: 6 }}>TEMPS ÉCOULÉ</div>
       </div>
 
-      {/* Petite mention discrète */}
-      <div style={{ marginTop: 24, fontSize: 11, color: "rgba(255,255,255,0.3)", fontFamily: "Arial, sans-serif", textAlign: "center" }}>
-        Ne quitte pas cette page pendant la génération.
+      {/* Mention honnête : pourquoi c'est long */}
+      <div style={{ marginTop: 24, fontSize: 11, color: "rgba(255,255,255,0.3)", fontFamily: "Arial, sans-serif", textAlign: "center", lineHeight: 1.5, maxWidth: 380 }}>
+        La génération prend environ 2 minutes : on recherche de vraies données sur le web pour ton projet. Ne quitte pas cette page.
       </div>
 
       </div>
