@@ -190,6 +190,8 @@ export default function App() {
   const ACCENT_GRAD = isOrange ? "linear-gradient(90deg,#ff9d3d,#ff5e3a)" : "#fff";
   const NOW_COLOR = isOrange ? "#ff7a2e" : "rgba(255,255,255,0.72)";
   const ACCENT_ON_DARK = isOrange ? "#ff7a2e" : "#fff"; // accents sur fond sombre (quiz)
+  const CREAM = "#faf8f5";        // fond clair principal (blanc cassé très léger)
+  const CREAM_ALT = "#f4f1ec";    // fond clair secondaire (sections / cartes décalées)
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -564,7 +566,7 @@ ${sections.map((s, i) => {
   const sectionPad = isMobile ? "56px 20px" : "96px 60px";
 
   return (
-    <div style={{ background: "#fff", minHeight: "100vh", fontFamily: "'Arial Black', Arial, sans-serif", color: "#000", overflowX: "hidden" }}>
+    <div style={{ background: CREAM, minHeight: "100vh", fontFamily: "'Arial Black', Arial, sans-serif", color: "#000", overflowX: "hidden" }}>
       <style>{`
         @keyframes fadeIn { from{opacity:0} to{opacity:1} }
         @keyframes slideUp { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
@@ -601,7 +603,7 @@ ${sections.map((s, i) => {
 
       {/* ── NAV ── */}
       {screen !== "intro" && (
-        <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, background: screen === "quiz" ? "rgba(0,0,0,0.95)" : "rgba(255,255,255,0.97)", backdropFilter: "blur(10px)", borderBottom: `1px solid ${screen === "quiz" ? "rgba(255,255,255,0.1)" : "#e5e5e5"}`, padding: `0 ${isMobile ? "20px" : "60px"}`, height: 60, display: "flex", justifyContent: "space-between", alignItems: "center", animation: "fadeIn 0.4s ease both" }}>
+        <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, background: screen === "quiz" ? "rgba(0,0,0,0.95)" : "rgba(250,248,245,0.97)", backdropFilter: "blur(10px)", borderBottom: `1px solid ${screen === "quiz" ? "rgba(255,255,255,0.1)" : "#ebe7e0"}`, padding: `0 ${isMobile ? "20px" : "60px"}`, height: 60, display: "flex", justifyContent: "space-between", alignItems: "center", animation: "fadeIn 0.4s ease both" }}>
           <button onClick={restart} style={{ background: "none", border: "none", display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ width: 34, height: 34, borderRadius: "50%", background: screen === "quiz" ? "#fff" : "#000", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
               <span style={{ color: screen === "quiz" ? "#000" : "#fff", fontSize: 11, fontWeight: 900 }}>PS</span>
@@ -691,7 +693,7 @@ ${sections.map((s, i) => {
           </div>
 
           {/* POUR QUI */}
-          <div style={{ background: "#fff", padding: sectionPad, borderTop: "2px solid #000" }}>
+          <div style={{ background: CREAM, padding: sectionPad, borderTop: "2px solid #000" }}>
             <div style={{ maxWidth: 900, margin: "0 auto" }}>
               <div style={{ fontSize: 13, letterSpacing: "0.2em", color: isOrange ? "#ff7a2e" : "#000", marginBottom: 40, fontWeight: 900 }}>FAIT POUR TOI SI —</div>
               {["TU AS UNE IDÉE MAIS TU NE SAIS PAS PAR OÙ COMMENCER", "TU VEUX SAVOIR SI TON IDÉE EST VIABLE", "TU VEUX STRUCTURER TON PROJET RAPIDEMENT", "TU VEUX TE METTRE À TON COMPTE", "TU VEUX CRÉER TON ENTREPRISE AVEC UN PLAN CLAIR", "TU CHERCHES UN BUSINESS PLAN SIMPLE ET PERSONNALISÉ"].map((item, i) => (
@@ -704,7 +706,7 @@ ${sections.map((s, i) => {
           </div>
 
           {/* COMMENT ÇA MARCHE */}
-          <div id="comment" style={{ background: "#f5f5f5", padding: sectionPad, borderTop: "2px solid #000" }}>
+          <div id="comment" style={{ background: CREAM_ALT, padding: sectionPad, borderTop: "2px solid #000" }}>
             <div style={{ maxWidth: 900, margin: "0 auto" }}>
               <div style={{ fontSize: 13, letterSpacing: "0.2em", color: isOrange ? "#ff7a2e" : "#000", marginBottom: 48, fontWeight: 900 }}>COMMENT ÇA MARCHE</div>
               <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: isMobile ? 32 : 2 }}>
@@ -740,7 +742,7 @@ ${sections.map((s, i) => {
           </div>
 
           {/* À PROPOS */}
-          <div id="apropos" style={{ background: "#f5f5f5", padding: sectionPad, borderTop: "2px solid #000" }}>
+          <div id="apropos" style={{ background: CREAM_ALT, padding: sectionPad, borderTop: "2px solid #000" }}>
             <div style={{ maxWidth: 900, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 32 : 80, alignItems: "center" }}>
               <div>
                 <div style={{ fontSize: 13, letterSpacing: "0.2em", color: isOrange ? "#ff7a2e" : "#000", marginBottom: 32, fontWeight: 900 }}>À PROPOS</div>
@@ -768,7 +770,7 @@ ${sections.map((s, i) => {
           </div>
 
           {/* FOOTER LÉGAL */}
-          <div style={{ background: "#fff", borderTop: "1px solid #e5e5e5", padding: isMobile ? "24px 20px" : "24px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+          <div style={{ background: CREAM, borderTop: "1px solid #ebe7e0", padding: isMobile ? "24px 20px" : "24px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
             <span style={{ fontSize: 11, color: "rgba(0,0,0,0.3)", fontFamily: "Arial, sans-serif" }}>© 2025-2026 PLANSTART — Tous droits réservés</span>
             <div style={{ display: "flex", gap: 24 }}>
               {[["Mentions légales", "/mentions-legales"], ["Confidentialité", "/confidentialite"], ["CGU", "/cgu"]].map(([label, href]) => (
@@ -978,9 +980,9 @@ ${sections.map((s, i) => {
               </div>
 
               {/* Sections */}
-              <div style={{ maxWidth: 800, margin: "0 auto", padding: isMobile ? "32px 16px 60px" : "48px 40px 80px", background: "#f0f0f0" }}>
+              <div style={{ maxWidth: 800, margin: "0 auto", padding: isMobile ? "32px 16px 60px" : "48px 40px 80px", background: CREAM_ALT }}>
                 {(result.sections || []).map((s, i) => (
-                  <div key={i} style={{ background: "#fff", borderRadius: 6, boxShadow: "0 4px 24px rgba(0,0,0,0.08)", padding: isMobile ? "28px 22px" : "48px 44px", marginBottom: isMobile ? 20 : 28 }}>
+                  <div key={i} style={{ background: "#fffefb", borderRadius: 6, boxShadow: "0 4px 24px rgba(0,0,0,0.08)", padding: isMobile ? "28px 22px" : "48px 44px", marginBottom: isMobile ? 20 : 28 }}>
                     <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: "0.2em", color: isOrange ? "#ff7a2e" : "rgba(0,0,0,0.3)", marginBottom: 10 }}>SECTION {String(i + 1).padStart(2, "0")} / {String((result.sections || []).length).padStart(2, "0")}</div>
                     <div style={{ display: "flex", gap: 16, marginBottom: 16, alignItems: "baseline", borderBottom: `3px solid ${isOrange ? "#ff7a2e" : "#000"}`, paddingBottom: 14 }}>
                       <span style={{ fontSize: 13, fontWeight: 900, color: isOrange ? "#ff7a2e" : "rgba(0,0,0,0.25)", minWidth: 24 }}>{String(i + 1).padStart(2, "0")}</span>
@@ -1035,7 +1037,7 @@ ${sections.map((s, i) => {
               </div>
 
               {/* Footer */}
-              <div style={{ background: "#fff", borderTop: "1px solid #e5e5e5", padding: isMobile ? "24px 20px" : "24px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+              <div style={{ background: CREAM, borderTop: "1px solid #ebe7e0", padding: isMobile ? "24px 20px" : "24px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
                 <span style={{ fontSize: 11, color: "rgba(0,0,0,0.3)", fontFamily: "Arial, sans-serif" }}>© 2025-2026 PLANSTART</span>
                 <div style={{ display: "flex", gap: 24 }}>
                   {[["Mentions légales", "/mentions-legales"], ["Confidentialité", "/confidentialite"], ["CGU", "/cgu"]].map(([label, href]) => (
