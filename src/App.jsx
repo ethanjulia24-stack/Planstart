@@ -788,8 +788,9 @@ ${sections.map((s, i) => {
           {blocTransition && (
             <div style={{ position: "fixed", inset: 0, zIndex: 200, background: "#000", display: "flex", alignItems: "center", justifyContent: "center", animation: "fadeIn 0.3s ease both" }}>
               <div style={{ textAlign: "center", animation: "scaleIn 0.5s ease both" }}>
-                <div style={{ fontSize: 10, letterSpacing: "0.3em", color: "rgba(255,255,255,0.3)", marginBottom: 16, fontWeight: 900 }}>PARTIE SUIVANTE</div>
+                <div style={{ fontSize: 10, letterSpacing: "0.3em", color: isOrange ? "#ff7a2e" : "rgba(255,255,255,0.3)", marginBottom: 16, fontWeight: 900 }}>PARTIE SUIVANTE</div>
                 <div style={{ fontSize: isMobile ? "clamp(40px,12vw,72px)" : "clamp(56px,8vw,96px)", fontWeight: 900, color: "#fff" }}>{showBloc}</div>
+                <div style={{ width: 60, height: 4, background: isOrange ? "#ff7a2e" : "#fff", margin: "20px auto 0", borderRadius: 2 }} />
               </div>
             </div>
           )}
