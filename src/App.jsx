@@ -4,15 +4,20 @@ import { useState, useEffect, useRef } from "react";
 // Version écran (renvoie du JSX).
 const linkify = (text) => {
   const parts = String(text || "").split(/(https?:\/\/[^\s)]+)/g);
-  return parts.map((part, i) =>
-    /^https?:\/\//.test(part)
-      ? <a key={i} href={part} target="_blank" rel="noopener noreferrer" style={{ color: "#0a58ca", wordBreak: "break-all" }}>{part}</a>
-      : part
-  );
+  return parts.map((part, i) => {
+    if (/^https?:\/\//.test(part)) {
+      // Retire la ponctuation finale collée à l'URL (virgule, point, etc.) qui casse le lien
+      const m = part.match(/^(.*?)([.,;:!?）)\]]*)$/);
+      const url = m ? m[1] : part;
+      const trail = m ? m[2] : "";
+      return <span key={i}><a href={url} target="_blank" rel="noopener noreferrer" style={{ color: "#0a58ca", wordBreak: "break-all" }}>{url}</a>{trail}</span>;
+    }
+    return part;
+  });
 };
-// Version PDF : prend du texte DÉJÀ échappé et enrobe les URL dans des <a>.
+// Version PDF : prend du texte DÉJÀ échappé et enrobe les URL dans des <a> (ponctuation finale exclue).
 const linkifyHtml = (escaped) =>
-  String(escaped).replace(/(https?:\/\/[^\s)<]+)/g, '<a href="$1" style="color:#0a58ca;word-break:break-all;">$1</a>');
+  String(escaped).replace(/(https?:\/\/[^\s)<]*?)([.,;:!?）)\]]*)(?=\s|<|$)/g, '<a href="$1" style="color:#0a58ca;word-break:break-all;">$1</a>$2');
 
 // ─── CONSTANTES ───────────────────────────────────────────────────────────────
 
@@ -33,6 +38,9 @@ const IMAGES = [
   "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1200&q=80",
   "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80",
 ];
+
+// Photo de couverture du business plan généré (homme pensif, ambiance sombre/chaude)
+const COVER_IMAGE = "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=1400&q=80";
 
 
 
@@ -154,7 +162,8 @@ function LoadingScreen() {
 // ─── APP PRINCIPAL ─────────────────────────────────────────────────────────────
 
 export default function App() {
-  const [screen, setScreen] = useState("intro");
+  const [screen, setScreen] = useState("home");
+  const [theme, setTheme] = useState("bw"); // "bw" (noir/blanc) ou "orange"
   const [introStep, setIntroStep] = useState(0);
   const [introLetters, setIntroLetters] = useState("");
   const [slideIndex, setSlideIndex] = useState(0);
@@ -172,6 +181,13 @@ export default function App() {
   const [showIosHint, setShowIosHint] = useState(false);
   const [shareToast, setShareToast] = useState(false);
   const inputRef = useRef(null);
+
+  // ─── THÈME : accent orange ou noir/blanc ───
+  const isOrange = theme === "orange";
+  const ACCENT = isOrange ? "#ff7a2e" : "#000";
+  const ACCENT_GRAD = isOrange ? "linear-gradient(90deg,#ff9d3d,#ff5e3a)" : "#fff";
+  const NOW_COLOR = isOrange ? "#ff7a2e" : "rgba(255,255,255,0.35)";
+  const ACCENT_ON_DARK = isOrange ? "#ff7a2e" : "#fff"; // accents sur fond sombre (quiz)
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -369,6 +385,17 @@ export default function App() {
       return `<tr><td>${label}</td><td style="padding-left:14px;padding-right:14px;"><div class="cover-crit-bar-bg"><div class="cover-crit-bar" style="width:${n * 10}%;background:${col};"></div></div></td><td>${n}/10</td></tr>`;
     }).join("");
 
+    // Ligne des 6 critères en bas de couverture (cellules)
+    const critCellsHTML = (data.scoreCriteres || []).map(c => {
+      const m = c.match(/^(.+?):\s*(\d+)\/10/);
+      if (!m) return "";
+      const label = (CRIT_FR[m[1].trim()] || m[1].trim()).toUpperCase();
+      const n = parseInt(m[2]);
+      return `<div class="cover-crit-cell"><div class="cl">${label}</div><div class="cv">${n}/10</div></div>`;
+    }).join("");
+    // Thème du document : suit le thème actif du site (à brancher plus tard). Défaut = N&B.
+    const themeClass = theme === "orange" ? "theme-orange" : "";
+
     const html = `<!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -386,25 +413,52 @@ export default function App() {
     .section { page-break-before:always; break-before:page; }
     .point { page-break-inside:avoid; break-inside:avoid; }
     .section-title, .section-intro, .section-num { page-break-after:avoid; break-after:avoid; }
+    .section { padding-top:60px; }
   }
+  .theme-orange .section-title { border-bottom-color:#ff7a2e; }
+  .theme-orange .section-intro { border-left-color:#ff7a2e; }
+  .theme-orange .section-num { color:#ff7a2e; }
+  .theme-orange .toc-num { color:#ff7a2e; }
   a { color:#0a58ca; word-break:break-all; }
 
   /* COUVERTURE */
-  .cover { min-height:297mm; background:#000; color:#fff; display:flex; flex-direction:column; justify-content:space-between; padding:60px; box-sizing:border-box; overflow:hidden; }
-  .cover-brand { font-size:11px; font-weight:900; letter-spacing:0.3em; color:rgba(255,255,255,0.3); margin-bottom:64px; }
-  .cover-label { font-size:10px; font-weight:900; letter-spacing:0.25em; color:rgba(255,255,255,0.35); margin-bottom:16px; }
-  .cover-activite { font-size:40px; font-weight:900; letter-spacing:-0.02em; line-height:1.1; margin-bottom:36px; color:#fff; }
-  .cover-expl { max-width:500px; color:rgba(255,255,255,0.55); font-size:13px; line-height:1.7; margin-bottom:32px; padding-left:16px; border-left:3px solid rgba(255,255,255,0.2); }
-  .cover-crit-lbl { font-size:9px; font-weight:900; letter-spacing:0.2em; color:rgba(255,255,255,0.3); margin-bottom:12px; }
-  .cover-crit-table { border-collapse:collapse; width:460px; max-width:100%; margin-bottom:36px; table-layout:fixed; }
-  .cover-crit-table td { padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.06); font-size:12px; vertical-align:middle; }
-  .cover-crit-table td:first-child { color:rgba(255,255,255,0.45); width:140px; }
-  .cover-crit-table td:nth-child(2) { width:auto; }
-  .cover-crit-bar-bg { width:100%; height:5px; background:rgba(255,255,255,0.12); border-radius:3px; }
+  .cover { position:relative; min-height:297mm; background:#000; color:#fff; display:flex; flex-direction:column; justify-content:space-between; padding:60px; box-sizing:border-box; overflow:hidden; }
+  .cover-photo { position:absolute; inset:0; background-image:url('${COVER_IMAGE}'); background-size:cover; background-position:72% center; z-index:0; }
+  .cover-veil { position:absolute; inset:0; z-index:1; background:linear-gradient(90deg, rgba(0,0,0,0.94) 0%, rgba(0,0,0,0.82) 42%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.15) 100%); }
+  .cover > div { position:relative; z-index:2; }
+  .cover-brand { font-size:15px; font-weight:900; letter-spacing:0.04em; color:#fff; margin-bottom:4px; }
+  .cover-brand .s { color:#fff; }
+  .cover-label { font-size:10px; font-weight:900; letter-spacing:0.22em; color:rgba(255,255,255,0.55); margin-bottom:18px; }
+  .cover-bar { width:42px; height:4px; background:#fff; margin-bottom:44px; }
+  .cover-activite { font-size:46px; font-weight:900; letter-spacing:-0.02em; line-height:1.0; margin-bottom:18px; color:#fff; text-transform:uppercase; }
+  .cover-now { color:#9a9a9a; }
+  .cover-expl { max-width:480px; color:rgba(255,255,255,0.6); font-size:13px; line-height:1.7; margin-bottom:30px; padding-left:16px; border-left:3px solid rgba(255,255,255,0.25); }
+  .cover-crit-lbl { font-size:12px; font-weight:900; letter-spacing:0.04em; color:#fff; margin-bottom:14px; }
+  .cover-crit-box { border:1px solid rgba(255,255,255,0.2); border-radius:10px; padding:18px 22px; width:480px; max-width:62%; background:rgba(0,0,0,0.35); margin-bottom:30px; }
+  .cover-crit-inner-lbl { font-size:8px; font-weight:900; letter-spacing:0.14em; color:rgba(255,255,255,0.5); margin-bottom:12px; }
+  .cover-crit-table { border-collapse:collapse; width:100%; table-layout:fixed; }
+  .cover-crit-table td { padding:7px 0; font-size:11px; vertical-align:middle; }
+  .cover-crit-table td:first-child { color:rgba(255,255,255,0.75); width:120px; }
+  .cover-crit-bar-bg { width:100%; height:5px; background:rgba(255,255,255,0.14); border-radius:3px; }
   .cover-crit-bar { height:5px; border-radius:3px; }
-  .cover-crit-table td:last-child { font-weight:900; color:#fff; text-align:right; padding-left:14px; width:46px; }
-  .cover-disclaimer { font-size:10.5px; color:rgba(255,255,255,0.22); line-height:1.55; max-width:500px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.08); margin-bottom:28px; }
-  .cover-footer { display:flex; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px; font-size:11px; color:rgba(255,255,255,0.25); }
+  .cover-crit-table td:last-child { font-weight:900; color:#fff; text-align:right; padding-left:14px; width:42px; }
+  .cover-crit-row { display:flex; justify-content:space-between; margin-bottom:26px; gap:0; }
+  .cover-crit-cell { flex:1; text-align:center; padding:0 4px; border-left:1px solid rgba(255,255,255,0.18); }
+  .cover-crit-cell:first-child { border-left:none; }
+  .cover-crit-cell .cl { font-size:8px; font-weight:900; letter-spacing:0.05em; color:rgba(255,255,255,0.6); }
+  .cover-crit-cell .cv { font-size:15px; font-weight:900; color:#fff; margin-top:4px; }
+  .cover-disclaimer { font-size:10px; color:rgba(255,255,255,0.3); line-height:1.55; max-width:480px; padding-top:18px; border-top:1px solid rgba(255,255,255,0.12); margin-bottom:24px; }
+  .cover-footer { display:flex; justify-content:space-between; align-items:flex-end; border-top:1px solid rgba(255,255,255,0.15); padding-top:18px; font-size:11px; color:rgba(255,255,255,0.45); }
+  .cover-footer .web { color:#fff; font-weight:900; }
+
+  /* ACCENTS ORANGE (si thème orange) */
+  .theme-orange .cover-brand .s { color:#ff7a2e; }
+  .theme-orange .cover-bar { background:#ff7a2e; }
+  .theme-orange .cover-now { color:#ff7a2e; }
+  .theme-orange .cover-crit-box { border-color:#ff7a2e; }
+  .theme-orange .cover-crit-cell .cv { color:#ff7a2e; }
+  .theme-orange .cover-footer .web { color:#ff7a2e; }
+  .theme-orange .cover-footer { border-top-color:rgba(255,122,46,0.5); }
 
   /* SOMMAIRE */
   .toc { padding:60px; }
@@ -427,20 +481,24 @@ export default function App() {
   .pg-footer { text-align:center; font-size:9px; color:rgba(0,0,0,0.2); font-weight:900; letter-spacing:0.1em; border-top:1px solid #e5e5e5; padding-top:14px; margin-top:36px; }
 </style>
 </head>
-<body>
+<body class="${themeClass}">
 
 <div class="cover">
+  <div class="cover-photo"></div>
+  <div class="cover-veil"></div>
   <div>
-    <div class="cover-brand">PLANSTART — planstart.fr</div>
+    <div class="cover-brand">PLAN<span class="s">START</span></div>
     <div class="cover-label">BUSINESS PLAN PROFESSIONNEL</div>
-    <div class="cover-activite">${escape(data.titre || data.nom || data.activite || "Mon projet")}</div>
+    <div class="cover-bar"></div>
+    <div class="cover-activite">${escape(data.titre || data.nom || data.activite || "Mon projet")}<br><span class="cover-now">Maintenant.</span></div>
     ${data.scoreExplication ? `<div class="cover-expl">${escape(data.scoreExplication)}</div>` : ""}
-    ${critHTML ? `<div class="cover-crit-lbl">ANALYSE DE TON PROJET</div><table class="cover-crit-table">${critHTML}</table>` : ""}
-    <div class="cover-disclaimer">Ce business plan a été généré par intelligence artificielle à partir de tes réponses. Il est fourni à titre indicatif et peut contenir des erreurs ou imprécisions. Vérifie les informations importantes auprès de sources officielles avant de te lancer.</div>
+    ${critHTML ? `<div class="cover-crit-lbl">POTENTIEL DU PROJET</div><div class="cover-crit-box"><div class="cover-crit-inner-lbl">ANALYSE DE TON PROJET</div><table class="cover-crit-table">${critHTML}</table></div>` : ""}
+    ${critCellsHTML ? `<div class="cover-crit-row">${critCellsHTML}</div>` : ""}
+    <div class="cover-disclaimer">Ce business plan a été généré par intelligence artificielle à partir de tes réponses. Il est fourni à titre indicatif et peut contenir des erreurs ou imprécisions. Les montants chiffrés (loyers, charges, projections) sont des estimations à confirmer auprès de sources officielles avant de te lancer.</div>
   </div>
   <div class="cover-footer">
     <div>Document confidentiel<br>Généré le ${date}</div>
-    <div style="text-align:right">PLANSTART<br>planstart.fr</div>
+    <div style="text-align:right" class="web">planstart.fr</div>
   </div>
 </div>
 
@@ -518,7 +576,7 @@ ${sections.map((s, i) => {
         button { cursor:pointer; font-family:'Arial Black',Arial,sans-serif; }
         ::placeholder { color:rgba(255,255,255,0.3); font-family:Arial,sans-serif; font-weight:400; }
         .input-light::placeholder { color:rgba(0,0,0,0.3); }
-        .example-pill:hover { background:#000!important; color:#fff!important; }
+        .example-pill:hover { border-color:#fff!important; color:#fff!important; }
       `}</style>
 
       {/* ── INTRO ── */}
@@ -546,7 +604,7 @@ ${sections.map((s, i) => {
             <div style={{ width: 34, height: 34, borderRadius: "50%", background: screen === "quiz" ? "#fff" : "#000", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
               <span style={{ color: screen === "quiz" ? "#000" : "#fff", fontSize: 11, fontWeight: 900 }}>PS</span>
             </div>
-            <span style={{ fontSize: isMobile ? 15 : 18, fontWeight: 900, color: screen === "quiz" ? "#fff" : "#000" }}>PLANSTART</span>
+            <span style={{ fontSize: isMobile ? 15 : 18, fontWeight: 900, color: screen === "quiz" ? "#fff" : "#000" }}>PLAN<span style={{ color: isOrange ? "#ff7a2e" : (screen === "quiz" ? "#fff" : "#000") }}>START</span></span>
           </button>
           {screen !== "quiz" && (
             <div style={{ display: "flex", gap: isMobile ? 12 : 32, alignItems: "center" }}>
@@ -561,6 +619,12 @@ ${sections.map((s, i) => {
       {screen === "home" && (
         <div style={{ animation: "fadeIn 0.5s ease both" }}>
 
+          {/* SWITCH DE THÈME — flottant en bas, home uniquement */}
+          <div style={{ position: "fixed", bottom: 16, left: "50%", transform: "translateX(-50%)", zIndex: 200, display: "flex", gap: 6, background: "rgba(20,20,22,0.92)", backdropFilter: "blur(8px)", padding: 6, borderRadius: 40, border: "1px solid rgba(255,255,255,0.15)", boxShadow: "0 8px 30px rgba(0,0,0,0.4)" }}>
+            <button onClick={() => setTheme("bw")} style={{ fontFamily: "Arial, sans-serif", fontWeight: 700, fontSize: 11, letterSpacing: "0.05em", padding: "10px 16px", borderRadius: 30, border: "none", background: !isOrange ? "#fff" : "transparent", color: !isOrange ? "#000" : "#fff", whiteSpace: "nowrap" }}>NOIR / BLANC</button>
+            <button onClick={() => setTheme("orange")} style={{ fontFamily: "Arial, sans-serif", fontWeight: 700, fontSize: 11, letterSpacing: "0.05em", padding: "10px 16px", borderRadius: 30, border: "none", background: isOrange ? "linear-gradient(90deg,#ff9d3d,#ff5e3a)" : "transparent", color: "#fff", whiteSpace: "nowrap" }}>ORANGE / NOIR</button>
+          </div>
+
           {/* HERO */}
           <div style={{ height: "100vh", position: "relative", overflow: "hidden" }}>
             {IMAGES.map((img, i) => (
@@ -568,11 +632,12 @@ ${sections.map((s, i) => {
             ))}
             <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.52)" }} />
             <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", padding: isMobile ? "0 24px" : "0 60px", animation: "slideUp 0.8s ease 0.2s both" }}>
+              <div style={{ fontSize: isMobile ? 12 : 14, color: "rgba(255,255,255,0.7)", fontWeight: 900, letterSpacing: "0.06em", marginBottom: 18, fontFamily: "Arial, sans-serif" }}>Ton idée mérite d'exister. On t'aide à la structurer.</div>
               <h1 style={{ fontSize: isMobile ? "clamp(44px,13vw,72px)" : "clamp(72px,9vw,120px)", fontWeight: 900, lineHeight: 0.9, letterSpacing: "-0.03em", color: "#fff", marginBottom: 20, textTransform: "uppercase" }}>
-                TON PROJET.<br />TON PLAN.<br /><span style={{ color: "rgba(255,255,255,0.35)", fontStyle: "italic" }}>MAINTENANT.</span>
+                TON PROJET.<br />TON PLAN.<br /><span style={{ color: NOW_COLOR, fontStyle: isOrange ? "normal" : "italic" }}>MAINTENANT.</span>
               </h1>
               <p style={{ fontSize: isMobile ? 14 : 16, color: "rgba(255,255,255,0.6)", fontWeight: 400, marginBottom: 36, fontFamily: "Arial, sans-serif", maxWidth: 500 }}>Tu as une idée d'entreprise ? Réponds à 10 questions et obtiens un business plan personnalisé en quelques minutes. Gratuit et sans compte.</p>
-              <button onClick={() => setScreen("quiz")} style={{ background: "#fff", color: "#000", border: "none", padding: isMobile ? "16px 40px" : "18px 48px", fontSize: 13, fontWeight: 900, letterSpacing: "0.12em" }}>CRÉER MON PLAN →</button>
+              <button onClick={() => setScreen("quiz")} style={{ background: ACCENT_GRAD, color: isOrange ? "#fff" : "#000", border: "none", padding: isMobile ? "16px 40px" : "18px 48px", fontSize: 13, fontWeight: 900, letterSpacing: "0.12em", borderRadius: isOrange ? 14 : 0, boxShadow: isOrange ? "0 10px 30px rgba(255,94,58,0.35)" : "none" }}>CRÉER MON PLAN →</button>
             </div>
             <div style={{ position: "absolute", bottom: 32, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 8 }}>
               {IMAGES.map((_, i) => (<div key={i} onClick={() => setSlideIndex(i)} style={{ width: i === slideIndex ? 32 : 8, height: 2, background: i === slideIndex ? "#fff" : "rgba(255,255,255,0.3)", cursor: "pointer", transition: "all 0.4s ease" }} />))}
@@ -601,7 +666,7 @@ ${sections.map((s, i) => {
                   <div style={{ fontSize: 13, letterSpacing: "0.2em", color: "rgba(255,255,255,0.5)", marginBottom: 32, fontWeight: 900 }}>CE QUE TU OBTIENS</div>
                   {["ANALYSE DE MARCHÉ", "PROJECTIONS FINANCIÈRES", "STRATÉGIE MARKETING", "PLAN D'ACTION 90 JOURS", "DÉMARCHES LÉGALES", "GESTION DES RISQUES"].map((item, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "14px 0", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
-                      <span style={{ fontSize: 13, color: "#fff", minWidth: 28, fontWeight: 900, opacity: 0.4 }}>{String(i + 1).padStart(2, "0")}</span>
+                      <span style={{ fontSize: 13, color: isOrange ? "#ff7a2e" : "#fff", minWidth: 28, fontWeight: 900, opacity: isOrange ? 1 : 0.4 }}>{String(i + 1).padStart(2, "0")}</span>
                       <span style={{ fontSize: 14, fontWeight: 900 }}>{item}</span>
                     </div>
                   ))}
@@ -614,7 +679,7 @@ ${sections.map((s, i) => {
                   <div style={{ fontSize: 13, letterSpacing: "0.2em", color: "rgba(255,255,255,0.5)", marginBottom: 36, fontWeight: 900 }}>CE QUE TU OBTIENS</div>
                   {["ANALYSE DE MARCHÉ", "PROJECTIONS FINANCIÈRES", "STRATÉGIE MARKETING", "PLAN D'ACTION 90 JOURS", "DÉMARCHES LÉGALES", "GESTION DES RISQUES"].map((item, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 20, padding: "16px 0", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
-                      <span style={{ fontSize: 13, color: "#fff", minWidth: 32, fontWeight: 900, opacity: 0.4 }}>{String(i + 1).padStart(2, "0")}</span>
+                      <span style={{ fontSize: 13, color: isOrange ? "#ff7a2e" : "#fff", minWidth: 32, fontWeight: 900, opacity: isOrange ? 1 : 0.4 }}>{String(i + 1).padStart(2, "0")}</span>
                       <span style={{ fontSize: 15, fontWeight: 900 }}>{item}</span>
                     </div>
                   ))}
@@ -629,7 +694,7 @@ ${sections.map((s, i) => {
               <div style={{ fontSize: 13, letterSpacing: "0.2em", color: "#000", marginBottom: 40, fontWeight: 900 }}>FAIT POUR TOI SI —</div>
               {["TU AS UNE IDÉE MAIS TU NE SAIS PAS PAR OÙ COMMENCER", "TU VEUX SAVOIR SI TON IDÉE EST VIABLE", "TU VEUX STRUCTURER TON PROJET RAPIDEMENT", "TU VEUX TE METTRE À TON COMPTE", "TU VEUX CRÉER TON ENTREPRISE AVEC UN PLAN CLAIR", "TU CHERCHES UN BUSINESS PLAN SIMPLE ET PERSONNALISÉ"].map((item, i) => (
                 <div key={i} style={{ borderBottom: "1px solid #e5e5e5", padding: "20px 0", display: "flex", alignItems: "flex-start", gap: 20 }}>
-                  <span style={{ fontSize: 13, color: "#000", minWidth: 30, fontWeight: 900, paddingTop: 2, opacity: 0.4 }}>{String(i + 1).padStart(2, "0")}</span>
+                  <span style={{ fontSize: 13, color: isOrange ? "#ff7a2e" : "#000", minWidth: 30, fontWeight: 900, paddingTop: 2, opacity: isOrange ? 1 : 0.4 }}>{String(i + 1).padStart(2, "0")}</span>
                   <span style={{ fontSize: isMobile ? 15 : 20, fontWeight: 900, lineHeight: 1.3 }}>{item}</span>
                 </div>
               ))}
@@ -647,7 +712,7 @@ ${sections.map((s, i) => {
                   { n: "03", titre: "TU TÉLÉCHARGES", desc: "Récupère un business plan complet, personnalisé et prêt à t'aider à lancer ton activité." },
                 ].map((step, i) => (
                   <div key={i} style={{ padding: isMobile ? "0" : "0 40px 0 0", borderRight: !isMobile && i < 2 ? "1px solid #e5e5e5" : "none" }}>
-                    <div style={{ fontSize: 48, fontWeight: 900, color: "#e5e5e5", lineHeight: 1, marginBottom: 16 }}>{step.n}</div>
+                    <div style={{ fontSize: 48, fontWeight: 900, color: isOrange ? "#ff7a2e" : "#e5e5e5", lineHeight: 1, marginBottom: 16, opacity: isOrange ? 0.9 : 1 }}>{step.n}</div>
                     <div style={{ fontSize: 16, fontWeight: 900, marginBottom: 12 }}>{step.titre}</div>
                     <div style={{ fontSize: 14, color: "rgba(0,0,0,0.5)", lineHeight: 1.7, fontFamily: "Arial, sans-serif" }}>{step.desc}</div>
                   </div>
@@ -666,7 +731,7 @@ ${sections.map((s, i) => {
               <p style={{ fontSize: 16, color: "rgba(255,255,255,0.5)", fontFamily: "Arial, sans-serif", lineHeight: 1.7, marginBottom: 40 }}>
                 Génère ton business plan gratuitement et aide-nous à améliorer la plateforme. Ton avis nous aidera à rendre l'outil encore plus utile.
               </p>
-              <button onClick={() => setScreen("quiz")} style={{ background: "#fff", color: "#000", border: "none", padding: isMobile ? "16px 40px" : "18px 48px", fontSize: 13, fontWeight: 900, letterSpacing: "0.12em" }}>
+              <button onClick={() => setScreen("quiz")} style={{ background: isOrange ? "linear-gradient(90deg,#ff9d3d,#ff5e3a)" : "#fff", color: isOrange ? "#fff" : "#000", border: "none", padding: isMobile ? "16px 40px" : "18px 48px", fontSize: 13, fontWeight: 900, letterSpacing: "0.12em", borderRadius: isOrange ? 14 : 0 }}>
                 CRÉER MON PLAN →
               </button>
             </div>
@@ -684,7 +749,7 @@ ${sections.map((s, i) => {
               <div style={{ background: "#000", padding: "40px 32px" }}>
                 {[{ n: "100% GRATUIT", label: "" }, { n: "7 SECTIONS", label: "" }, { n: "10 QUESTIONS", label: "" }].map((stat, i) => (
                   <div key={i} style={{ padding: "18px 0", borderBottom: i < 2 ? "1px solid rgba(255,255,255,0.1)" : "none" }}>
-                    <div style={{ fontSize: isMobile ? 20 : 32, fontWeight: 900, color: "#fff", lineHeight: 1 }}>{stat.n}</div>
+                    <div style={{ fontSize: isMobile ? 20 : 32, fontWeight: 900, color: isOrange ? "#ff7a2e" : "#fff", lineHeight: 1 }}>{stat.n}</div>
                     <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", fontFamily: "Arial, sans-serif", marginTop: 4, letterSpacing: "0.05em" }}>{stat.label}</div>
                   </div>
                 ))}
@@ -695,9 +760,9 @@ ${sections.map((s, i) => {
           {/* CTA FINAL */}
           <div style={{ background: "#000", padding: isMobile ? "80px 24px" : "120px 60px", textAlign: "center" }}>
             <h2 style={{ fontSize: isMobile ? "clamp(48px,14vw,80px)" : "clamp(64px,10vw,110px)", fontWeight: 900, letterSpacing: "-0.03em", lineHeight: 0.9, marginBottom: 40, color: "#fff", textTransform: "uppercase" }}>
-              PRÊT À<br /><span style={{ color: "rgba(255,255,255,0.2)" }}>TE LANCER ?</span>
+              PRÊT À<br /><span style={{ color: isOrange ? "#ff7a2e" : "rgba(255,255,255,0.2)" }}>TE LANCER ?</span>
             </h2>
-            <button onClick={() => setScreen("quiz")} style={{ background: "#fff", color: "#000", border: "none", padding: isMobile ? "16px 40px" : "20px 60px", fontSize: isMobile ? 13 : 14, fontWeight: 900, letterSpacing: "0.15em" }}>C'EST PARTI →</button>
+            <button onClick={() => setScreen("quiz")} style={{ background: isOrange ? "linear-gradient(90deg,#ff9d3d,#ff5e3a)" : "#fff", color: isOrange ? "#fff" : "#000", border: "none", padding: isMobile ? "16px 40px" : "20px 60px", fontSize: isMobile ? 13 : 14, fontWeight: 900, letterSpacing: "0.15em", borderRadius: isOrange ? 14 : 0 }}>C'EST PARTI →</button>
           </div>
 
           {/* FOOTER LÉGAL */}
@@ -738,17 +803,17 @@ ${sections.map((s, i) => {
                   const isDone = i < currentBlocIndex;
                   return (
                     <div key={i} style={{ flex: 1 }}>
-                      <div style={{ height: 3, background: isActive ? "#fff" : isDone ? "rgba(255,255,255,0.6)" : "rgba(255,255,255,0.15)", marginBottom: 8, borderRadius: 2, transition: "background 0.3s" }} />
+                      <div style={{ height: 3, background: isActive ? ACCENT_ON_DARK : isDone ? (isOrange ? "rgba(255,122,46,0.55)" : "rgba(255,255,255,0.6)") : "rgba(255,255,255,0.15)", marginBottom: 8, borderRadius: 2, transition: "background 0.3s" }} />
                       <div style={{ fontSize: isMobile ? 7 : 9, color: isActive ? "#fff" : isDone ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.2)", fontWeight: 900, letterSpacing: "0.08em" }}>{bloc}</div>
                     </div>
                   );
                 })}
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontSize: 12, fontWeight: 900, letterSpacing: "0.15em", color: "rgba(255,255,255,0.5)", background: "rgba(255,255,255,0.1)", padding: "4px 12px", borderRadius: 20 }}>
+                <span style={{ fontSize: 12, fontWeight: 900, letterSpacing: "0.15em", color: isOrange ? "#ff7a2e" : "rgba(255,255,255,0.5)", background: "rgba(255,255,255,0.1)", padding: "4px 12px", borderRadius: 20 }}>
                   {questions[qIndex]?.label || "01"} / 10
                 </span>
-                <span style={{ fontSize: 12, fontWeight: 900, color: "rgba(255,255,255,0.4)" }}>
+                <span style={{ fontSize: 12, fontWeight: 900, color: isOrange ? "#ff7a2e" : "rgba(255,255,255,0.4)" }}>
                   {Math.round(((qIndex + 1) / TOTAL_QUESTIONS) * 100)}%
                 </span>
               </div>
@@ -759,14 +824,26 @@ ${sections.map((s, i) => {
               {questions[qIndex]?.question || "Chargement..."}
             </h2>
 
-            {/* Exemples cliquables sur toutes les questions */}
-            {questions[qIndex]?.examples?.length > 0 && !current && (
+            {/* Exemples cliquables — restent visibles même quand on écrit */}
+            {questions[qIndex]?.examples?.length > 0 && (
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 20 }}>
-                {questions[qIndex].examples.slice(0, 4).map((ex, i) => (
-                  <button key={i} className="example-pill" onClick={() => setCurrent(ex)} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.7)", padding: "8px 16px", fontSize: 12, fontFamily: "Arial, sans-serif", borderRadius: 20, transition: "all 0.2s", cursor: "pointer" }}>
-                    {ex}
-                  </button>
-                ))}
+                {questions[qIndex].examples.slice(0, 4).map((ex, i) => {
+                  const isPicked = current.toLowerCase().includes(ex.toLowerCase());
+                  return (
+                    <button key={i} className="example-pill" onClick={() => {
+                      // Ajoute l'exemple à la réponse au lieu de l'écraser (permet d'en combiner)
+                      setCurrent(prev => {
+                        const base = prev.trim();
+                        if (!base) return ex;
+                        if (base.toLowerCase().includes(ex.toLowerCase())) return base;
+                        return base + ", " + ex.charAt(0).toLowerCase() + ex.slice(1);
+                      });
+                      if (inputRef.current) inputRef.current.focus();
+                    }} style={{ background: isPicked ? (isOrange ? "rgba(255,122,46,0.25)" : "rgba(255,255,255,0.25)") : "rgba(255,255,255,0.08)", border: `1px solid ${isPicked ? (isOrange ? "#ff7a2e" : "#fff") : "rgba(255,255,255,0.2)"}`, color: isPicked ? "#fff" : "rgba(255,255,255,0.7)", padding: "8px 16px", fontSize: 12, fontFamily: "Arial, sans-serif", borderRadius: 20, transition: "all 0.2s", cursor: "pointer" }}>
+                      {isPicked ? "✓ " : "+ "}{ex}
+                    </button>
+                  );
+                })}
               </div>
             )}
 
@@ -778,8 +855,8 @@ ${sections.map((s, i) => {
                 onChange={e => setCurrent(e.target.value.slice(0, MAX_INPUT_LENGTH))}
                 onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey && current.trim() && !loadingQuestion) { e.preventDefault(); handleNext(); } }}
                 placeholder={questions[qIndex]?.placeholder || "Décris ta réponse..."}
-                rows={3}
-                style={{ width: "100%", background: "transparent", border: "none", fontSize: 16, fontFamily: "Arial, sans-serif", color: "#fff", resize: "none", lineHeight: 1.7 }}
+                rows={2}
+                style={{ width: "100%", background: "transparent", border: "none", fontSize: 16, fontFamily: "Arial, sans-serif", color: "#fff", resize: "none", lineHeight: 1.6 }}
               />
               <div style={{ textAlign: "right", fontSize: 10, color: current.length > MAX_INPUT_LENGTH * 0.8 ? "rgba(255,200,100,0.7)" : "rgba(255,255,255,0.2)", marginTop: 4 }}>
                 {current.length}/{MAX_INPUT_LENGTH}
@@ -788,7 +865,7 @@ ${sections.map((s, i) => {
 
             {/* Encourage des réponses détaillées */}
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, fontSize: isMobile ? 11 : 12, color: "rgba(255,255,255,0.45)", fontFamily: "Arial, sans-serif", lineHeight: 1.5 }}>
-              <span style={{ fontSize: 13, flexShrink: 0 }}>✦</span>
+              <span style={{ fontSize: 13, flexShrink: 0, color: isOrange ? "#ff7a2e" : "inherit" }}>✦</span>
               <span>Plus ta réponse est précise et détaillée, plus ton business plan sera personnalisé et pertinent.</span>
             </div>
 
@@ -803,7 +880,7 @@ ${sections.map((s, i) => {
             {/* Boutons */}
             <div style={{ display: "flex", gap: 12 }}>
               <button onClick={handleBack} style={{ flex: 1, background: "rgba(255,255,255,0.08)", border: "2px solid rgba(255,255,255,0.2)", color: "#fff", fontSize: 12, fontWeight: 900, letterSpacing: "0.12em", padding: "16px", borderRadius: 2, cursor: "pointer" }}>← RETOUR</button>
-              <button onClick={handleNext} disabled={!current.trim() || loadingQuestion} style={{ flex: 2, background: current.trim() && !loadingQuestion ? "#fff" : "rgba(255,255,255,0.08)", border: `2px solid ${current.trim() && !loadingQuestion ? "#fff" : "rgba(255,255,255,0.2)"}`, color: current.trim() && !loadingQuestion ? "#000" : "rgba(255,255,255,0.3)", fontSize: 12, fontWeight: 900, letterSpacing: "0.12em", padding: "16px", borderRadius: 2, transition: "all 0.2s", cursor: current.trim() && !loadingQuestion ? "pointer" : "not-allowed" }}>
+              <button onClick={handleNext} disabled={!current.trim() || loadingQuestion} style={{ flex: 2, background: current.trim() && !loadingQuestion ? (isOrange ? "linear-gradient(90deg,#ff9d3d,#ff5e3a)" : "#fff") : "rgba(255,255,255,0.08)", border: `2px solid ${current.trim() && !loadingQuestion ? (isOrange ? "transparent" : "#fff") : "rgba(255,255,255,0.2)"}`, color: current.trim() && !loadingQuestion ? (isOrange ? "#fff" : "#000") : "rgba(255,255,255,0.3)", fontSize: 12, fontWeight: 900, letterSpacing: "0.12em", padding: "16px", borderRadius: isOrange ? 12 : 2, transition: "all 0.2s", cursor: current.trim() && !loadingQuestion ? "pointer" : "not-allowed" }}>
                 {loadingQuestion ? "..." : qIndex === TOTAL_QUESTIONS - 1 ? "GÉNÉRER MON PLAN →" : "SUIVANT →"}
               </button>
             </div>
@@ -870,15 +947,16 @@ ${sections.map((s, i) => {
               </div>
 
               {/* Sections */}
-              <div style={{ maxWidth: 800, margin: "0 auto", padding: isMobile ? "40px 20px 60px" : "60px 40px 80px" }}>
+              <div style={{ maxWidth: 800, margin: "0 auto", padding: isMobile ? "32px 16px 60px" : "48px 40px 80px", background: "#f0f0f0" }}>
                 {(result.sections || []).map((s, i) => (
-                  <div key={i} style={{ marginBottom: 8, borderBottom: "1px solid #e5e5e5", paddingBottom: 32, marginTop: 32 }}>
-                    <div style={{ display: "flex", gap: 20, marginBottom: 16 }}>
-                      <span style={{ fontSize: 11, fontWeight: 900, color: "rgba(0,0,0,0.2)", minWidth: 28, paddingTop: 4 }}>{String(i + 1).padStart(2, "0")}</span>
-                      <h3 style={{ fontSize: isMobile ? 16 : 20, fontWeight: 900, letterSpacing: "-0.01em" }}>{s.titre}</h3>
+                  <div key={i} style={{ background: "#fff", borderRadius: 6, boxShadow: "0 4px 24px rgba(0,0,0,0.08)", padding: isMobile ? "28px 22px" : "48px 44px", marginBottom: isMobile ? 20 : 28 }}>
+                    <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: "0.2em", color: isOrange ? "#ff7a2e" : "rgba(0,0,0,0.3)", marginBottom: 10 }}>SECTION {String(i + 1).padStart(2, "0")} / {String((result.sections || []).length).padStart(2, "0")}</div>
+                    <div style={{ display: "flex", gap: 16, marginBottom: 16, alignItems: "baseline", borderBottom: `3px solid ${isOrange ? "#ff7a2e" : "#000"}`, paddingBottom: 14 }}>
+                      <span style={{ fontSize: 13, fontWeight: 900, color: isOrange ? "#ff7a2e" : "rgba(0,0,0,0.25)", minWidth: 24 }}>{String(i + 1).padStart(2, "0")}</span>
+                      <h3 style={{ fontSize: isMobile ? 17 : 22, fontWeight: 900, letterSpacing: "-0.01em" }}>{s.titre}</h3>
                     </div>
                     {s.intro && (
-                      <p style={{ fontSize: 14, color: "rgba(0,0,0,0.5)", fontStyle: "italic", lineHeight: 1.6, marginBottom: 20, paddingLeft: 48, borderLeft: "3px solid #000" }}>{s.intro}</p>
+                      <p style={{ fontSize: 14, color: "rgba(0,0,0,0.5)", fontStyle: "italic", lineHeight: 1.6, marginBottom: 20, paddingLeft: 16, borderLeft: `3px solid ${isOrange ? "#ff7a2e" : "#000"}` }}>{s.intro}</p>
                     )}
                     <div style={{ paddingLeft: 0 }}>
                       {(s.points || []).map((point, j) => {
